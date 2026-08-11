@@ -1,0 +1,192 @@
+schema_version: "0.1.0"
+rename_stage: staging
+raw_column_policy: "Raw에서는 원본명을 유지하고 Staging에서 아래 이름으로 변경한다."
+
+common:
+  STDR_YYQU_CD: source_quarter
+  TRDAR_SE_CD: trade_area_type_code
+  TRDAR_SE_CD_NM: trade_area_type_name
+  TRDAR_CD: trade_area_code
+  TRDAR_CD_NM: trade_area_name
+  SVC_INDUTY_CD: industry_code
+  SVC_INDUTY_CD_NM: industry_name
+
+trade_area:
+  XCNTS_VALUE: x_coord_epsg5181
+  YDNTS_VALUE: y_coord_epsg5181
+  SIGNGU_CD: district_code
+  SIGNGU_CD_NM: district_name
+  ADSTRD_CD: administrative_dong_code
+  ADSTRD_CD_NM: administrative_dong_name
+  RELM_AR: trade_area_size_sqm
+
+stores:
+  SIMILR_INDUTY_STOR_CO: total_store_count
+  STOR_CO: independent_store_count
+  FRC_STOR_CO: franchise_store_count
+  OPBIZ_STOR_CO: opened_store_count
+  OPBIZ_RT: opening_rate
+  CLSBIZ_STOR_CO: closed_store_count
+  CLSBIZ_RT: closure_rate
+
+sales:
+  THSMON_SELNG_AMT: quarterly_sales_amount
+  THSMON_SELNG_CO: quarterly_sales_count
+  MDWK_SELNG_AMT: weekday_sales_amount
+  WKEND_SELNG_AMT: weekend_sales_amount
+  MDWK_SELNG_CO: weekday_sales_count
+  WKEND_SELNG_CO: weekend_sales_count
+  MON_SELNG_AMT: monday_sales_amount
+  TUES_SELNG_AMT: tuesday_sales_amount
+  WED_SELNG_AMT: wednesday_sales_amount
+  THUR_SELNG_AMT: thursday_sales_amount
+  FRI_SELNG_AMT: friday_sales_amount
+  SAT_SELNG_AMT: saturday_sales_amount
+  SUN_SELNG_AMT: sunday_sales_amount
+  MON_SELNG_CO: monday_sales_count
+  TUES_SELNG_CO: tuesday_sales_count
+  WED_SELNG_CO: wednesday_sales_count
+  THUR_SELNG_CO: thursday_sales_count
+  FRI_SELNG_CO: friday_sales_count
+  SAT_SELNG_CO: saturday_sales_count
+  SUN_SELNG_CO: sunday_sales_count
+  TMZON_00_06_SELNG_AMT: sales_amount_00_06
+  TMZON_06_11_SELNG_AMT: sales_amount_06_11
+  TMZON_11_14_SELNG_AMT: sales_amount_11_14
+  TMZON_14_17_SELNG_AMT: sales_amount_14_17
+  TMZON_17_21_SELNG_AMT: sales_amount_17_21
+  TMZON_21_24_SELNG_AMT: sales_amount_21_24
+  TMZON_00_06_SELNG_CO: sales_count_00_06
+  TMZON_06_11_SELNG_CO: sales_count_06_11
+  TMZON_11_14_SELNG_CO: sales_count_11_14
+  TMZON_14_17_SELNG_CO: sales_count_14_17
+  TMZON_17_21_SELNG_CO: sales_count_17_21
+  TMZON_21_24_SELNG_CO: sales_count_21_24
+  ML_SELNG_AMT: male_sales_amount
+  FML_SELNG_AMT: female_sales_amount
+  ML_SELNG_CO: male_sales_count
+  FML_SELNG_CO: female_sales_count
+  AGRDE_10_SELNG_AMT: age_10_sales_amount
+  AGRDE_20_SELNG_AMT: age_20_sales_amount
+  AGRDE_30_SELNG_AMT: age_30_sales_amount
+  AGRDE_40_SELNG_AMT: age_40_sales_amount
+  AGRDE_50_SELNG_AMT: age_50_sales_amount
+  AGRDE_60_ABOVE_SELNG_AMT: age_60_plus_sales_amount
+  AGRDE_10_SELNG_CO: age_10_sales_count
+  AGRDE_20_SELNG_CO: age_20_sales_count
+  AGRDE_30_SELNG_CO: age_30_sales_count
+  AGRDE_40_SELNG_CO: age_40_sales_count
+  AGRDE_50_SELNG_CO: age_50_sales_count
+  AGRDE_60_ABOVE_SELNG_CO: age_60_plus_sales_count
+
+floating_population:
+  TOT_FLPOP_CO: total_floating_population
+  ML_FLPOP_CO: male_floating_population
+  FML_FLPOP_CO: female_floating_population
+  AGRDE_10_FLPOP_CO: age_10_floating_population
+  AGRDE_20_FLPOP_CO: age_20_floating_population
+  AGRDE_30_FLPOP_CO: age_30_floating_population
+  AGRDE_40_FLPOP_CO: age_40_floating_population
+  AGRDE_50_FLPOP_CO: age_50_floating_population
+  AGRDE_60_ABOVE_FLPOP_CO: age_60_plus_floating_population
+  TMZON_00_06_FLPOP_CO: floating_population_00_06
+  TMZON_06_11_FLPOP_CO: floating_population_06_11
+  TMZON_11_14_FLPOP_CO: floating_population_11_14
+  TMZON_14_17_FLPOP_CO: floating_population_14_17
+  TMZON_17_21_FLPOP_CO: floating_population_17_21
+  TMZON_21_24_FLPOP_CO: floating_population_21_24
+  MON_FLPOP_CO: monday_floating_population
+  TUES_FLPOP_CO: tuesday_floating_population
+  WED_FLPOP_CO: wednesday_floating_population
+  THUR_FLPOP_CO: thursday_floating_population
+  FRI_FLPOP_CO: friday_floating_population
+  SAT_FLPOP_CO: saturday_floating_population
+  SUN_FLPOP_CO: sunday_floating_population
+
+resident_population:
+  TOT_REPOP_CO: total_resident_population
+  ML_REPOP_CO: male_resident_population
+  FML_REPOP_CO: female_resident_population
+  AGRDE_10_REPOP_CO: age_10_resident_population
+  AGRDE_20_REPOP_CO: age_20_resident_population
+  AGRDE_30_REPOP_CO: age_30_resident_population
+  AGRDE_40_REPOP_CO: age_40_resident_population
+  AGRDE_50_REPOP_CO: age_50_resident_population
+  AGRDE_60_ABOVE_REPOP_CO: age_60_plus_resident_population
+  MAG_10_REPOP_CO: male_age_10_resident_population
+  MAG_20_REPOP_CO: male_age_20_resident_population
+  MAG_30_REPOP_CO: male_age_30_resident_population
+  MAG_40_REPOP_CO: male_age_40_resident_population
+  MAG_50_REPOP_CO: male_age_50_resident_population
+  MAG_60_ABOVE_REPOP_CO: male_age_60_plus_resident_population
+  FAG_10_REPOP_CO: female_age_10_resident_population
+  FAG_20_REPOP_CO: female_age_20_resident_population
+  FAG_30_REPOP_CO: female_age_30_resident_population
+  FAG_40_REPOP_CO: female_age_40_resident_population
+  FAG_50_REPOP_CO: female_age_50_resident_population
+  FAG_60_ABOVE_REPOP_CO: female_age_60_plus_resident_population
+  TOT_HSHLD_CO: total_household_count
+  APT_HSHLD_CO: apartment_household_count
+  NON_APT_HSHLD_CO: non_apartment_household_count
+
+working_population:
+  TOT_WRC_POPLTN_CO: total_working_population
+  ML_WRC_POPLTN_CO: male_working_population
+  FML_WRC_POPLTN_CO: female_working_population
+  AGRDE_10_WRC_POPLTN_CO: age_10_working_population
+  AGRDE_20_WRC_POPLTN_CO: age_20_working_population
+  AGRDE_30_WRC_POPLTN_CO: age_30_working_population
+  AGRDE_40_WRC_POPLTN_CO: age_40_working_population
+  AGRDE_50_WRC_POPLTN_CO: age_50_working_population
+  AGRDE_60_ABOVE_WRC_POPLTN_CO: age_60_plus_working_population
+  MAG_10_WRC_POPLTN_CO: male_age_10_working_population
+  MAG_20_WRC_POPLTN_CO: male_age_20_working_population
+  MAG_30_WRC_POPLTN_CO: male_age_30_working_population
+  MAG_40_WRC_POPLTN_CO: male_age_40_working_population
+  MAG_50_WRC_POPLTN_CO: male_age_50_working_population
+  MAG_60_ABOVE_WRC_POPLTN_CO: male_age_60_plus_working_population
+  FAG_10_WRC_POPLTN_CO: female_age_10_working_population
+  FAG_20_WRC_POPLTN_CO: female_age_20_working_population
+  FAG_30_WRC_POPLTN_CO: female_age_30_working_population
+  FAG_40_WRC_POPLTN_CO: female_age_40_working_population
+  FAG_50_WRC_POPLTN_CO: female_age_50_working_population
+  FAG_60_ABOVE_WRC_POPLTN_CO: female_age_60_plus_working_population
+
+apartments:
+  APT_HSMP_CO: apartment_complex_count
+  AE_66_SQMT_BELO_HSHLD_CO: apartment_households_below_66_sqm
+  AE_66_SQMT_HSHLD_CO: apartment_households_66_sqm
+  AE_99_SQMT_HSHLD_CO: apartment_households_99_sqm
+  AE_132_SQMT_HSHLD_CO: apartment_households_132_sqm
+  AE_165_SQMT_HSHLD_CO: apartment_households_165_sqm
+  PC_1_HDMIL_BELO_HSHLD_CO: apartment_households_below_100m_krw
+  PC_1_HDMIL_HSHLD_CO: apartment_households_100m_krw
+  PC_2_HDMIL_HSHLD_CO: apartment_households_200m_krw
+  PC_3_HDMIL_HSHLD_CO: apartment_households_300m_krw
+  PC_4_HDMIL_HSHLD_CO: apartment_households_400m_krw
+  PC_5_HDMIL_HSHLD_CO: apartment_households_500m_krw
+  PC_6_HDMIL_ABOVE_HSHLD_CO: apartment_households_600m_plus_krw
+  AVRG_AE: average_apartment_area
+  AVRG_MKTC: average_apartment_market_price
+
+facilities:
+  VIATR_FCLTY_CO: total_facility_count
+  PBLOFC_CO: public_office_count
+  BANK_CO: bank_count
+  GEHSPT_CO: general_hospital_count
+  GNRL_HSPTL_CO: hospital_count
+  PARMACY_CO: pharmacy_count
+  KNDRGR_CO: kindergarten_count
+  ELESCH_CO: elementary_school_count
+  MSKUL_CO: middle_school_count
+  HGSCHL_CO: high_school_count
+  UNIV_CO: university_count
+  DRTS_CO: department_store_count
+  SUPMK_CO: supermarket_count
+  THEAT_CO: theater_count
+  STAYNG_FCLTY_CO: accommodation_count
+  ARPRT_CO: airport_count
+  RLROAD_STATN_CO: railway_station_count
+  BUS_TRMINL_CO: bus_terminal_count
+  SUBWAY_STATN_CO: subway_station_count
+  BUS_STTN_CO: bus_stop_count

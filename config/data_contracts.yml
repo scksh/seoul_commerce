@@ -1,0 +1,549 @@
+contract_status: draft
+schema_version: "0.1.0"
+last_verified_at: "2026-08-11"
+
+api:
+  base_url: "http://openapi.seoul.go.kr:8088"
+  response_format: json
+  max_rows_per_request: 1000
+  server_side_column_selection: false
+  api_key_env: SEOUL_OPEN_DATA_API_KEY
+
+raw_storage_policy:
+  description: "API 페이지 응답 직후 required_columns만 선택하며 전체 응답 파일은 저장하지 않는다."
+  preserve_source_values: true
+  reject_missing_required_columns: true
+  record_all_response_column_names_in_manifest: true
+  management_columns:
+    - SOURCE_DATASET_ID
+    - COLLECTED_AT
+    - SOURCE_BASE_DATE
+    - SCHEMA_VERSION
+
+datasets:
+  trade_area:
+    display_name: 영역-상권
+    dataset_id: OA-15560
+    service_name: TbgisTrdarRelm
+    source_url: "https://data.seoul.go.kr/dataList/OA-15560/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 1650
+    update_frequency: irregular
+    reported_source_base_date: "2023-06"
+    grain: trade_area
+    period_filter_supported: false
+    industry_filter_supported: false
+    key_columns: [TRDAR_CD]
+    code_columns: [TRDAR_SE_CD, TRDAR_CD, SIGNGU_CD, ADSTRD_CD]
+    numeric_columns: [XCNTS_VALUE, YDNTS_VALUE, RELM_AR]
+    required_columns:
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - XCNTS_VALUE
+      - YDNTS_VALUE
+      - SIGNGU_CD
+      - SIGNGU_CD_NM
+      - ADSTRD_CD
+      - ADSTRD_CD_NM
+      - RELM_AR
+
+  stores:
+    display_name: 점포-상권
+    dataset_id: OA-15577
+    service_name: VwsmTrdarStorQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15577/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 1604844
+    update_frequency: quarterly
+    grain: quarter_trade_area_industry
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD, SVC_INDUTY_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD, SVC_INDUTY_CD]
+    numeric_columns:
+      - SIMILR_INDUTY_STOR_CO
+      - STOR_CO
+      - FRC_STOR_CO
+      - OPBIZ_STOR_CO
+      - OPBIZ_RT
+      - CLSBIZ_STOR_CO
+      - CLSBIZ_RT
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - SVC_INDUTY_CD
+      - SVC_INDUTY_CD_NM
+      - SIMILR_INDUTY_STOR_CO
+      - STOR_CO
+      - FRC_STOR_CO
+      - OPBIZ_STOR_CO
+      - OPBIZ_RT
+      - CLSBIZ_STOR_CO
+      - CLSBIZ_RT
+
+  sales:
+    display_name: 추정매출-상권
+    dataset_id: OA-15572
+    service_name: VwsmTrdarSelngQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15572/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 460329
+    update_frequency: quarterly
+    grain: quarter_trade_area_industry
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD, SVC_INDUTY_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD, SVC_INDUTY_CD]
+    numeric_columns:
+      - THSMON_SELNG_AMT
+      - THSMON_SELNG_CO
+      - MDWK_SELNG_AMT
+      - WKEND_SELNG_AMT
+      - MDWK_SELNG_CO
+      - WKEND_SELNG_CO
+      - MON_SELNG_AMT
+      - TUES_SELNG_AMT
+      - WED_SELNG_AMT
+      - THUR_SELNG_AMT
+      - FRI_SELNG_AMT
+      - SAT_SELNG_AMT
+      - SUN_SELNG_AMT
+      - MON_SELNG_CO
+      - TUES_SELNG_CO
+      - WED_SELNG_CO
+      - THUR_SELNG_CO
+      - FRI_SELNG_CO
+      - SAT_SELNG_CO
+      - SUN_SELNG_CO
+      - TMZON_00_06_SELNG_AMT
+      - TMZON_06_11_SELNG_AMT
+      - TMZON_11_14_SELNG_AMT
+      - TMZON_14_17_SELNG_AMT
+      - TMZON_17_21_SELNG_AMT
+      - TMZON_21_24_SELNG_AMT
+      - TMZON_00_06_SELNG_CO
+      - TMZON_06_11_SELNG_CO
+      - TMZON_11_14_SELNG_CO
+      - TMZON_14_17_SELNG_CO
+      - TMZON_17_21_SELNG_CO
+      - TMZON_21_24_SELNG_CO
+      - ML_SELNG_AMT
+      - FML_SELNG_AMT
+      - ML_SELNG_CO
+      - FML_SELNG_CO
+      - AGRDE_10_SELNG_AMT
+      - AGRDE_20_SELNG_AMT
+      - AGRDE_30_SELNG_AMT
+      - AGRDE_40_SELNG_AMT
+      - AGRDE_50_SELNG_AMT
+      - AGRDE_60_ABOVE_SELNG_AMT
+      - AGRDE_10_SELNG_CO
+      - AGRDE_20_SELNG_CO
+      - AGRDE_30_SELNG_CO
+      - AGRDE_40_SELNG_CO
+      - AGRDE_50_SELNG_CO
+      - AGRDE_60_ABOVE_SELNG_CO
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - SVC_INDUTY_CD
+      - SVC_INDUTY_CD_NM
+      - THSMON_SELNG_AMT
+      - THSMON_SELNG_CO
+      - MDWK_SELNG_AMT
+      - WKEND_SELNG_AMT
+      - MDWK_SELNG_CO
+      - WKEND_SELNG_CO
+      - MON_SELNG_AMT
+      - TUES_SELNG_AMT
+      - WED_SELNG_AMT
+      - THUR_SELNG_AMT
+      - FRI_SELNG_AMT
+      - SAT_SELNG_AMT
+      - SUN_SELNG_AMT
+      - MON_SELNG_CO
+      - TUES_SELNG_CO
+      - WED_SELNG_CO
+      - THUR_SELNG_CO
+      - FRI_SELNG_CO
+      - SAT_SELNG_CO
+      - SUN_SELNG_CO
+      - TMZON_00_06_SELNG_AMT
+      - TMZON_06_11_SELNG_AMT
+      - TMZON_11_14_SELNG_AMT
+      - TMZON_14_17_SELNG_AMT
+      - TMZON_17_21_SELNG_AMT
+      - TMZON_21_24_SELNG_AMT
+      - TMZON_00_06_SELNG_CO
+      - TMZON_06_11_SELNG_CO
+      - TMZON_11_14_SELNG_CO
+      - TMZON_14_17_SELNG_CO
+      - TMZON_17_21_SELNG_CO
+      - TMZON_21_24_SELNG_CO
+      - ML_SELNG_AMT
+      - FML_SELNG_AMT
+      - ML_SELNG_CO
+      - FML_SELNG_CO
+      - AGRDE_10_SELNG_AMT
+      - AGRDE_20_SELNG_AMT
+      - AGRDE_30_SELNG_AMT
+      - AGRDE_40_SELNG_AMT
+      - AGRDE_50_SELNG_AMT
+      - AGRDE_60_ABOVE_SELNG_AMT
+      - AGRDE_10_SELNG_CO
+      - AGRDE_20_SELNG_CO
+      - AGRDE_30_SELNG_CO
+      - AGRDE_40_SELNG_CO
+      - AGRDE_50_SELNG_CO
+      - AGRDE_60_ABOVE_SELNG_CO
+
+  floating_population:
+    display_name: 길단위인구-상권
+    dataset_id: OA-15568
+    service_name: VwsmTrdarFlpopQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15568/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 34633
+    update_frequency: quarterly
+    grain: quarter_trade_area
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD]
+    numeric_columns:
+      - TOT_FLPOP_CO
+      - ML_FLPOP_CO
+      - FML_FLPOP_CO
+      - AGRDE_10_FLPOP_CO
+      - AGRDE_20_FLPOP_CO
+      - AGRDE_30_FLPOP_CO
+      - AGRDE_40_FLPOP_CO
+      - AGRDE_50_FLPOP_CO
+      - AGRDE_60_ABOVE_FLPOP_CO
+      - TMZON_00_06_FLPOP_CO
+      - TMZON_06_11_FLPOP_CO
+      - TMZON_11_14_FLPOP_CO
+      - TMZON_14_17_FLPOP_CO
+      - TMZON_17_21_FLPOP_CO
+      - TMZON_21_24_FLPOP_CO
+      - MON_FLPOP_CO
+      - TUES_FLPOP_CO
+      - WED_FLPOP_CO
+      - THUR_FLPOP_CO
+      - FRI_FLPOP_CO
+      - SAT_FLPOP_CO
+      - SUN_FLPOP_CO
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - TOT_FLPOP_CO
+      - ML_FLPOP_CO
+      - FML_FLPOP_CO
+      - AGRDE_10_FLPOP_CO
+      - AGRDE_20_FLPOP_CO
+      - AGRDE_30_FLPOP_CO
+      - AGRDE_40_FLPOP_CO
+      - AGRDE_50_FLPOP_CO
+      - AGRDE_60_ABOVE_FLPOP_CO
+      - TMZON_00_06_FLPOP_CO
+      - TMZON_06_11_FLPOP_CO
+      - TMZON_11_14_FLPOP_CO
+      - TMZON_14_17_FLPOP_CO
+      - TMZON_17_21_FLPOP_CO
+      - TMZON_21_24_FLPOP_CO
+      - MON_FLPOP_CO
+      - TUES_FLPOP_CO
+      - WED_FLPOP_CO
+      - THUR_FLPOP_CO
+      - FRI_FLPOP_CO
+      - SAT_FLPOP_CO
+      - SUN_FLPOP_CO
+
+  resident_population:
+    display_name: 상주인구-상권
+    dataset_id: OA-15584
+    service_name: VwsmTrdarRepopQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15584/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 34275
+    update_frequency: semiannual
+    grain: quarter_trade_area
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD]
+    numeric_columns:
+      - TOT_REPOP_CO
+      - ML_REPOP_CO
+      - FML_REPOP_CO
+      - AGRDE_10_REPOP_CO
+      - AGRDE_20_REPOP_CO
+      - AGRDE_30_REPOP_CO
+      - AGRDE_40_REPOP_CO
+      - AGRDE_50_REPOP_CO
+      - AGRDE_60_ABOVE_REPOP_CO
+      - MAG_10_REPOP_CO
+      - MAG_20_REPOP_CO
+      - MAG_30_REPOP_CO
+      - MAG_40_REPOP_CO
+      - MAG_50_REPOP_CO
+      - MAG_60_ABOVE_REPOP_CO
+      - FAG_10_REPOP_CO
+      - FAG_20_REPOP_CO
+      - FAG_30_REPOP_CO
+      - FAG_40_REPOP_CO
+      - FAG_50_REPOP_CO
+      - FAG_60_ABOVE_REPOP_CO
+      - TOT_HSHLD_CO
+      - APT_HSHLD_CO
+      - NON_APT_HSHLD_CO
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - TOT_REPOP_CO
+      - ML_REPOP_CO
+      - FML_REPOP_CO
+      - AGRDE_10_REPOP_CO
+      - AGRDE_20_REPOP_CO
+      - AGRDE_30_REPOP_CO
+      - AGRDE_40_REPOP_CO
+      - AGRDE_50_REPOP_CO
+      - AGRDE_60_ABOVE_REPOP_CO
+      - MAG_10_REPOP_CO
+      - MAG_20_REPOP_CO
+      - MAG_30_REPOP_CO
+      - MAG_40_REPOP_CO
+      - MAG_50_REPOP_CO
+      - MAG_60_ABOVE_REPOP_CO
+      - FAG_10_REPOP_CO
+      - FAG_20_REPOP_CO
+      - FAG_30_REPOP_CO
+      - FAG_40_REPOP_CO
+      - FAG_50_REPOP_CO
+      - FAG_60_ABOVE_REPOP_CO
+      - TOT_HSHLD_CO
+      - APT_HSHLD_CO
+      - NON_APT_HSHLD_CO
+
+  working_population:
+    display_name: 직장인구-상권
+    dataset_id: OA-15569
+    service_name: VwsmTrdarWrcPopltnQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15569/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 34386
+    update_frequency: semiannual
+    grain: quarter_trade_area
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD]
+    numeric_columns:
+      - TOT_WRC_POPLTN_CO
+      - ML_WRC_POPLTN_CO
+      - FML_WRC_POPLTN_CO
+      - AGRDE_10_WRC_POPLTN_CO
+      - AGRDE_20_WRC_POPLTN_CO
+      - AGRDE_30_WRC_POPLTN_CO
+      - AGRDE_40_WRC_POPLTN_CO
+      - AGRDE_50_WRC_POPLTN_CO
+      - AGRDE_60_ABOVE_WRC_POPLTN_CO
+      - MAG_10_WRC_POPLTN_CO
+      - MAG_20_WRC_POPLTN_CO
+      - MAG_30_WRC_POPLTN_CO
+      - MAG_40_WRC_POPLTN_CO
+      - MAG_50_WRC_POPLTN_CO
+      - MAG_60_ABOVE_WRC_POPLTN_CO
+      - FAG_10_WRC_POPLTN_CO
+      - FAG_20_WRC_POPLTN_CO
+      - FAG_30_WRC_POPLTN_CO
+      - FAG_40_WRC_POPLTN_CO
+      - FAG_50_WRC_POPLTN_CO
+      - FAG_60_ABOVE_WRC_POPLTN_CO
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - TOT_WRC_POPLTN_CO
+      - ML_WRC_POPLTN_CO
+      - FML_WRC_POPLTN_CO
+      - AGRDE_10_WRC_POPLTN_CO
+      - AGRDE_20_WRC_POPLTN_CO
+      - AGRDE_30_WRC_POPLTN_CO
+      - AGRDE_40_WRC_POPLTN_CO
+      - AGRDE_50_WRC_POPLTN_CO
+      - AGRDE_60_ABOVE_WRC_POPLTN_CO
+      - MAG_10_WRC_POPLTN_CO
+      - MAG_20_WRC_POPLTN_CO
+      - MAG_30_WRC_POPLTN_CO
+      - MAG_40_WRC_POPLTN_CO
+      - MAG_50_WRC_POPLTN_CO
+      - MAG_60_ABOVE_WRC_POPLTN_CO
+      - FAG_10_WRC_POPLTN_CO
+      - FAG_20_WRC_POPLTN_CO
+      - FAG_30_WRC_POPLTN_CO
+      - FAG_40_WRC_POPLTN_CO
+      - FAG_50_WRC_POPLTN_CO
+      - FAG_60_ABOVE_WRC_POPLTN_CO
+
+  apartments:
+    display_name: 아파트-상권
+    dataset_id: OA-15566
+    service_name: VwsmTrdarAptQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15566/A/1/datasetView.do"
+    collection_status: blocked_api_error_500
+    sample_result: ERROR-500
+    sample_total_count: null
+    update_frequency: annual
+    grain: quarter_trade_area
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD]
+    numeric_columns:
+      - APT_HSMP_CO
+      - AE_66_SQMT_BELO_HSHLD_CO
+      - AE_66_SQMT_HSHLD_CO
+      - AE_99_SQMT_HSHLD_CO
+      - AE_132_SQMT_HSHLD_CO
+      - AE_165_SQMT_HSHLD_CO
+      - PC_1_HDMIL_BELO_HSHLD_CO
+      - PC_1_HDMIL_HSHLD_CO
+      - PC_2_HDMIL_HSHLD_CO
+      - PC_3_HDMIL_HSHLD_CO
+      - PC_4_HDMIL_HSHLD_CO
+      - PC_5_HDMIL_HSHLD_CO
+      - PC_6_HDMIL_ABOVE_HSHLD_CO
+      - AVRG_AE
+      - AVRG_MKTC
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - APT_HSMP_CO
+      - AE_66_SQMT_BELO_HSHLD_CO
+      - AE_66_SQMT_HSHLD_CO
+      - AE_99_SQMT_HSHLD_CO
+      - AE_132_SQMT_HSHLD_CO
+      - AE_165_SQMT_HSHLD_CO
+      - PC_1_HDMIL_BELO_HSHLD_CO
+      - PC_1_HDMIL_HSHLD_CO
+      - PC_2_HDMIL_HSHLD_CO
+      - PC_3_HDMIL_HSHLD_CO
+      - PC_4_HDMIL_HSHLD_CO
+      - PC_5_HDMIL_HSHLD_CO
+      - PC_6_HDMIL_ABOVE_HSHLD_CO
+      - AVRG_AE
+      - AVRG_MKTC
+
+  facilities:
+    display_name: 집객시설-상권
+    dataset_id: OA-15580
+    service_name: VwsmTrdarFcltyQq
+    source_url: "https://data.seoul.go.kr/dataList/OA-15580/A/1/datasetView.do"
+    collection_status: verified
+    sample_result: INFO-000
+    sample_total_count: 33138
+    update_frequency: annual
+    grain: quarter_trade_area
+    period_filter_supported: true
+    industry_filter_supported: false
+    key_columns: [STDR_YYQU_CD, TRDAR_CD]
+    code_columns: [STDR_YYQU_CD, TRDAR_SE_CD, TRDAR_CD]
+    numeric_columns:
+      - VIATR_FCLTY_CO
+      - PBLOFC_CO
+      - BANK_CO
+      - GEHSPT_CO
+      - GNRL_HSPTL_CO
+      - PARMACY_CO
+      - KNDRGR_CO
+      - ELESCH_CO
+      - MSKUL_CO
+      - HGSCHL_CO
+      - UNIV_CO
+      - DRTS_CO
+      - SUPMK_CO
+      - THEAT_CO
+      - STAYNG_FCLTY_CO
+      - ARPRT_CO
+      - RLROAD_STATN_CO
+      - BUS_TRMINL_CO
+      - SUBWAY_STATN_CO
+      - BUS_STTN_CO
+    required_columns:
+      - STDR_YYQU_CD
+      - TRDAR_SE_CD
+      - TRDAR_SE_CD_NM
+      - TRDAR_CD
+      - TRDAR_CD_NM
+      - VIATR_FCLTY_CO
+      - PBLOFC_CO
+      - BANK_CO
+      - GEHSPT_CO
+      - GNRL_HSPTL_CO
+      - PARMACY_CO
+      - KNDRGR_CO
+      - ELESCH_CO
+      - MSKUL_CO
+      - HGSCHL_CO
+      - UNIV_CO
+      - DRTS_CO
+      - SUPMK_CO
+      - THEAT_CO
+      - STAYNG_FCLTY_CO
+      - ARPRT_CO
+      - RLROAD_STATN_CO
+      - BUS_TRMINL_CO
+      - SUBWAY_STATN_CO
+      - BUS_STTN_CO
+
+excluded_from_openapi_collection:
+  consumption:
+    dataset_id: OA-21278
+    reason: "상권 단위 갱신 중단 및 현재 소비 분류와 불일치"
+  income:
+    reason: "최신 공개 컬럼 삭제 및 과거 기준 자료"
+  rent:
+    reason: "상권 단위 고정 스키마의 공개 OpenAPI 없음"
+  store_survival_history:
+    reason: "개별 점포 영업이력이 필요하며 집계 OpenAPI만으로 재현 불가"
+  building_road_transport:
+    reason: "추가 GIS 분석용 보조자료로 현재 원천 수집 범위에서 제외"
+
+derived_after_collection:
+  - quarter_over_quarter_change
+  - year_over_year_change
+  - sales_per_store
+  - average_transaction_value
+  - franchise_share
+  - closure_to_opening_ratio
+  - sales_per_floating_population
+  - resident_to_working_population_ratio
+  - population_density
+  - facility_density
+  - peer_group_rank

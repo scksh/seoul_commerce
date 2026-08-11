@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Generated data copies
+data/

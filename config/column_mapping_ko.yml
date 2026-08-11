@@ -1,0 +1,201 @@
+schema_version: "0.2.0"
+rename_stage: korean_copy
+raw_column_policy: "data/raw의 원본 컬럼명은 유지하고, data/korean 복사본에만 아래 한국어 컬럼명을 적용한다."
+
+# 모든 데이터셋에서 공통으로 사용하는 원본 컬럼명 -> 한국어 컬럼명
+common:
+  STDR_YYQU_CD: 기준_년분기_코드
+  TRDAR_SE_CD: 상권_구분_코드
+  TRDAR_SE_CD_NM: 상권_구분_코드명
+  TRDAR_CD: 상권_코드
+  TRDAR_CD_NM: 상권_코드명
+  SVC_INDUTY_CD: 서비스_업종_코드
+  SVC_INDUTY_CD_NM: 서비스_업종_코드명
+
+# 수집 과정에서 추가되는 관리 컬럼
+management:
+  SOURCE_DATASET_ID: 원본_데이터셋_ID
+  COLLECTED_AT: 수집_일시
+  SOURCE_BASE_DATE: 원본_기준_일자
+  SCHEMA_VERSION: 스키마_버전
+
+trade_area:
+  XCNTS_VALUE: X_좌표_EPSG5181
+  YDNTS_VALUE: Y_좌표_EPSG5181
+  SIGNGU_CD: 자치구_코드
+  SIGNGU_CD_NM: 자치구_명
+  ADSTRD_CD: 행정동_코드
+  ADSTRD_CD_NM: 행정동_명
+  RELM_AR: 상권_영역_면적_제곱미터
+
+stores:
+  SIMILR_INDUTY_STOR_CO: 유사업종_점포_수
+  STOR_CO: 일반_점포_수
+  FRC_STOR_CO: 프랜차이즈_점포_수
+  OPBIZ_STOR_CO: 개업_점포_수
+  OPBIZ_RT: 개업_율
+  CLSBIZ_STOR_CO: 폐업_점포_수
+  CLSBIZ_RT: 폐업_율
+
+sales:
+  THSMON_SELNG_AMT: 분기_매출_금액
+  THSMON_SELNG_CO: 분기_매출_건수
+  MDWK_SELNG_AMT: 주중_매출_금액
+  WKEND_SELNG_AMT: 주말_매출_금액
+  MDWK_SELNG_CO: 주중_매출_건수
+  WKEND_SELNG_CO: 주말_매출_건수
+  MON_SELNG_AMT: 월요일_매출_금액
+  TUES_SELNG_AMT: 화요일_매출_금액
+  WED_SELNG_AMT: 수요일_매출_금액
+  THUR_SELNG_AMT: 목요일_매출_금액
+  FRI_SELNG_AMT: 금요일_매출_금액
+  SAT_SELNG_AMT: 토요일_매출_금액
+  SUN_SELNG_AMT: 일요일_매출_금액
+  MON_SELNG_CO: 월요일_매출_건수
+  TUES_SELNG_CO: 화요일_매출_건수
+  WED_SELNG_CO: 수요일_매출_건수
+  THUR_SELNG_CO: 목요일_매출_건수
+  FRI_SELNG_CO: 금요일_매출_건수
+  SAT_SELNG_CO: 토요일_매출_건수
+  SUN_SELNG_CO: 일요일_매출_건수
+  TMZON_00_06_SELNG_AMT: 시간대_00_06_매출_금액
+  TMZON_06_11_SELNG_AMT: 시간대_06_11_매출_금액
+  TMZON_11_14_SELNG_AMT: 시간대_11_14_매출_금액
+  TMZON_14_17_SELNG_AMT: 시간대_14_17_매출_금액
+  TMZON_17_21_SELNG_AMT: 시간대_17_21_매출_금액
+  TMZON_21_24_SELNG_AMT: 시간대_21_24_매출_금액
+  TMZON_00_06_SELNG_CO: 시간대_00_06_매출_건수
+  TMZON_06_11_SELNG_CO: 시간대_06_11_매출_건수
+  TMZON_11_14_SELNG_CO: 시간대_11_14_매출_건수
+  TMZON_14_17_SELNG_CO: 시간대_14_17_매출_건수
+  TMZON_17_21_SELNG_CO: 시간대_17_21_매출_건수
+  TMZON_21_24_SELNG_CO: 시간대_21_24_매출_건수
+  ML_SELNG_AMT: 남성_매출_금액
+  FML_SELNG_AMT: 여성_매출_금액
+  ML_SELNG_CO: 남성_매출_건수
+  FML_SELNG_CO: 여성_매출_건수
+  AGRDE_10_SELNG_AMT: 10대_매출_금액
+  AGRDE_20_SELNG_AMT: 20대_매출_금액
+  AGRDE_30_SELNG_AMT: 30대_매출_금액
+  AGRDE_40_SELNG_AMT: 40대_매출_금액
+  AGRDE_50_SELNG_AMT: 50대_매출_금액
+  AGRDE_60_ABOVE_SELNG_AMT: 60대_이상_매출_금액
+  AGRDE_10_SELNG_CO: 10대_매출_건수
+  AGRDE_20_SELNG_CO: 20대_매출_건수
+  AGRDE_30_SELNG_CO: 30대_매출_건수
+  AGRDE_40_SELNG_CO: 40대_매출_건수
+  AGRDE_50_SELNG_CO: 50대_매출_건수
+  AGRDE_60_ABOVE_SELNG_CO: 60대_이상_매출_건수
+
+floating_population:
+  TOT_FLPOP_CO: 총_유동인구_수
+  ML_FLPOP_CO: 남성_유동인구_수
+  FML_FLPOP_CO: 여성_유동인구_수
+  AGRDE_10_FLPOP_CO: 10대_유동인구_수
+  AGRDE_20_FLPOP_CO: 20대_유동인구_수
+  AGRDE_30_FLPOP_CO: 30대_유동인구_수
+  AGRDE_40_FLPOP_CO: 40대_유동인구_수
+  AGRDE_50_FLPOP_CO: 50대_유동인구_수
+  AGRDE_60_ABOVE_FLPOP_CO: 60대_이상_유동인구_수
+  TMZON_00_06_FLPOP_CO: 시간대_00_06_유동인구_수
+  TMZON_06_11_FLPOP_CO: 시간대_06_11_유동인구_수
+  TMZON_11_14_FLPOP_CO: 시간대_11_14_유동인구_수
+  TMZON_14_17_FLPOP_CO: 시간대_14_17_유동인구_수
+  TMZON_17_21_FLPOP_CO: 시간대_17_21_유동인구_수
+  TMZON_21_24_FLPOP_CO: 시간대_21_24_유동인구_수
+  MON_FLPOP_CO: 월요일_유동인구_수
+  TUES_FLPOP_CO: 화요일_유동인구_수
+  WED_FLPOP_CO: 수요일_유동인구_수
+  THUR_FLPOP_CO: 목요일_유동인구_수
+  FRI_FLPOP_CO: 금요일_유동인구_수
+  SAT_FLPOP_CO: 토요일_유동인구_수
+  SUN_FLPOP_CO: 일요일_유동인구_수
+
+resident_population:
+  TOT_REPOP_CO: 총_상주인구_수
+  ML_REPOP_CO: 남성_상주인구_수
+  FML_REPOP_CO: 여성_상주인구_수
+  AGRDE_10_REPOP_CO: 10대_상주인구_수
+  AGRDE_20_REPOP_CO: 20대_상주인구_수
+  AGRDE_30_REPOP_CO: 30대_상주인구_수
+  AGRDE_40_REPOP_CO: 40대_상주인구_수
+  AGRDE_50_REPOP_CO: 50대_상주인구_수
+  AGRDE_60_ABOVE_REPOP_CO: 60대_이상_상주인구_수
+  MAG_10_REPOP_CO: 남성_10대_상주인구_수
+  MAG_20_REPOP_CO: 남성_20대_상주인구_수
+  MAG_30_REPOP_CO: 남성_30대_상주인구_수
+  MAG_40_REPOP_CO: 남성_40대_상주인구_수
+  MAG_50_REPOP_CO: 남성_50대_상주인구_수
+  MAG_60_ABOVE_REPOP_CO: 남성_60대_이상_상주인구_수
+  FAG_10_REPOP_CO: 여성_10대_상주인구_수
+  FAG_20_REPOP_CO: 여성_20대_상주인구_수
+  FAG_30_REPOP_CO: 여성_30대_상주인구_수
+  FAG_40_REPOP_CO: 여성_40대_상주인구_수
+  FAG_50_REPOP_CO: 여성_50대_상주인구_수
+  FAG_60_ABOVE_REPOP_CO: 여성_60대_이상_상주인구_수
+  TOT_HSHLD_CO: 총_가구_수
+  APT_HSHLD_CO: 아파트_가구_수
+  NON_APT_HSHLD_CO: 비아파트_가구_수
+
+working_population:
+  TOT_WRC_POPLTN_CO: 총_직장인구_수
+  ML_WRC_POPLTN_CO: 남성_직장인구_수
+  FML_WRC_POPLTN_CO: 여성_직장인구_수
+  AGRDE_10_WRC_POPLTN_CO: 10대_직장인구_수
+  AGRDE_20_WRC_POPLTN_CO: 20대_직장인구_수
+  AGRDE_30_WRC_POPLTN_CO: 30대_직장인구_수
+  AGRDE_40_WRC_POPLTN_CO: 40대_직장인구_수
+  AGRDE_50_WRC_POPLTN_CO: 50대_직장인구_수
+  AGRDE_60_ABOVE_WRC_POPLTN_CO: 60대_이상_직장인구_수
+  MAG_10_WRC_POPLTN_CO: 남성_10대_직장인구_수
+  MAG_20_WRC_POPLTN_CO: 남성_20대_직장인구_수
+  MAG_30_WRC_POPLTN_CO: 남성_30대_직장인구_수
+  MAG_40_WRC_POPLTN_CO: 남성_40대_직장인구_수
+  MAG_50_WRC_POPLTN_CO: 남성_50대_직장인구_수
+  MAG_60_ABOVE_WRC_POPLTN_CO: 남성_60대_이상_직장인구_수
+  FAG_10_WRC_POPLTN_CO: 여성_10대_직장인구_수
+  FAG_20_WRC_POPLTN_CO: 여성_20대_직장인구_수
+  FAG_30_WRC_POPLTN_CO: 여성_30대_직장인구_수
+  FAG_40_WRC_POPLTN_CO: 여성_40대_직장인구_수
+  FAG_50_WRC_POPLTN_CO: 여성_50대_직장인구_수
+  FAG_60_ABOVE_WRC_POPLTN_CO: 여성_60대_이상_직장인구_수
+
+apartments:
+  APT_HSMP_CO: 아파트_단지_수
+  AE_66_SQMT_BELO_HSHLD_CO: 아파트_66제곱미터_미만_가구_수
+  AE_66_SQMT_HSHLD_CO: 아파트_66제곱미터_가구_수
+  AE_99_SQMT_HSHLD_CO: 아파트_99제곱미터_가구_수
+  AE_132_SQMT_HSHLD_CO: 아파트_132제곱미터_가구_수
+  AE_165_SQMT_HSHLD_CO: 아파트_165제곱미터_가구_수
+  PC_1_HDMIL_BELO_HSHLD_CO: 아파트_1억원_미만_가구_수
+  PC_1_HDMIL_HSHLD_CO: 아파트_1억원대_가구_수
+  PC_2_HDMIL_HSHLD_CO: 아파트_2억원대_가구_수
+  PC_3_HDMIL_HSHLD_CO: 아파트_3억원대_가구_수
+  PC_4_HDMIL_HSHLD_CO: 아파트_4억원대_가구_수
+  PC_5_HDMIL_HSHLD_CO: 아파트_5억원대_가구_수
+  PC_6_HDMIL_ABOVE_HSHLD_CO: 아파트_6억원_이상_가구_수
+  AVRG_AE: 아파트_평균_면적
+  AVRG_MKTC: 아파트_평균_시가
+
+facilities:
+  VIATR_FCLTY_CO: 총_집객시설_수
+  PBLOFC_CO: 관공서_수
+  BANK_CO: 은행_수
+  GEHSPT_CO: 종합병원_수
+  GNRL_HSPTL_CO: 일반병원_수
+  PARMACY_CO: 약국_수
+  KNDRGR_CO: 유치원_수
+  ELESCH_CO: 초등학교_수
+  MSKUL_CO: 중학교_수
+  HGSCHL_CO: 고등학교_수
+  UNIV_CO: 대학교_수
+  DRTS_CO: 백화점_수
+  SUPMK_CO: 슈퍼마켓_수
+  THEAT_CO: 극장_수
+  STAYNG_FCLTY_CO: 숙박시설_수
+  ARPRT_CO: 공항_수
+  RLROAD_STATN_CO: 철도역_수
+  BUS_TRMINL_CO: 버스터미널_수
+  SUBWAY_STATN_CO: 지하철역_수
+  BUS_STTN_CO: 버스정류장_수
+

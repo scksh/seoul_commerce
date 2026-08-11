@@ -1,5 +1,5 @@
 [project]
-name = "python-project"
+name = "seoul-commerce"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,10 +10,17 @@ requires-python = ">=3.12"
 dependencies = [
     "ipykernel>=7.3.0",
     "jupyter>=1.1.1",
+    "pandas>=3.0.5",
+    "python-dotenv>=1.2.2",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "tqdm>=4.67.1",
+    "xmltodict>=1.0.4",
 ]
 
 [project.scripts]
-python-project = "python_project:main"
+seoul-commerce = "seoul_commerce.collector:main"
+seoul-commerce-korean = "seoul_commerce.column_translator:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
