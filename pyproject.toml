@@ -10,10 +10,16 @@ requires-python = ">=3.12"
 dependencies = [
     "ipykernel>=7.3.0",
     "jupyter>=1.1.1",
+    "matplotlib>=3.11.1",
     "pandas>=3.0.5",
+    "plotly>=6.9.0",
     "python-dotenv>=1.2.2",
     "pyyaml>=6.0.3",
     "requests>=2.34.2",
+    "scikit-learn>=1.9.0",
+    "seaborn>=0.13.2",
+    "statsmodels>=0.14.6",
+    "streamlit>=1.61.1",
     "tqdm>=4.67.1",
     "xmltodict>=1.0.4",
 ]
@@ -21,6 +27,7 @@ dependencies = [
 [project.scripts]
 seoul-commerce = "seoul_commerce.collector:main"
 seoul-commerce-korean = "seoul_commerce.column_translator:main"
+seoul-commerce-preprocess = "seoul_commerce.preprocessing:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

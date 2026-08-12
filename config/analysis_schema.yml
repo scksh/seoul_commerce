@@ -1,0 +1,282 @@
+schema_version: "1.0.0"
+
+datasets:
+  trade_area_master:
+    primary_key: [trade_area_code]
+    columns:
+      - trade_area_code
+      - trade_area_name
+      - trade_area_type_code
+      - trade_area_type_name
+      - district_code
+      - district_name
+      - admin_dong_code
+      - admin_dong_name
+      - x_epsg5181
+      - y_epsg5181
+      - longitude
+      - latitude
+      - area_sqm
+      - area_ha
+      - name_changed_flag
+      - source_base_date
+    dtypes:
+      string: [trade_area_code, trade_area_name, trade_area_type_code, district_code, district_name, admin_dong_code, admin_dong_name]
+      category: [trade_area_type_name]
+      Float64: [x_epsg5181, y_epsg5181, longitude, latitude, area_sqm, area_ha]
+      boolean: [name_changed_flag]
+      datetime64[ns]: [source_base_date]
+
+  area_quarter:
+    primary_key: [quarter_code, trade_area_code]
+    columns:
+      - quarter_code
+      - year
+      - quarter
+      - trade_area_code
+      - trade_area_name
+      - trade_area_type_code
+      - trade_area_type_name
+      - district_code
+      - district_name
+      - area_sqm
+      - area_ha
+      - total_floating_population
+      - total_resident_population
+      - total_working_population
+      - total_household_count
+      - apartment_household_count
+      - non_apartment_household_count
+      - total_facility_count
+      - public_office_count
+      - bank_count
+      - general_hospital_count
+      - hospital_count
+      - pharmacy_count
+      - kindergarten_count
+      - elementary_school_count
+      - middle_school_count
+      - high_school_count
+      - university_count
+      - department_store_count
+      - supermarket_count
+      - theater_count
+      - accommodation_count
+      - airport_count
+      - railway_station_count
+      - bus_terminal_count
+      - subway_station_count
+      - bus_stop_count
+      - floating_population_density
+      - resident_population_density
+      - working_population_density
+      - facility_density
+      - apartment_household_share
+      - resident_to_working_ratio
+      - has_floating_population
+      - has_resident_population
+      - has_working_population
+      - has_facilities
+      - floating_source_base_date
+      - resident_source_base_date
+      - working_source_base_date
+      - facilities_source_base_date
+      - resident_repeated_flag
+      - working_repeated_flag
+      - facilities_repeated_flag
+    dtypes:
+      string: [quarter_code, trade_area_code, trade_area_name, trade_area_type_code, district_code, district_name]
+      category: [trade_area_type_name]
+      Int64:
+        - year
+        - quarter
+        - total_floating_population
+        - total_resident_population
+        - total_working_population
+        - total_household_count
+        - apartment_household_count
+        - non_apartment_household_count
+        - total_facility_count
+        - public_office_count
+        - bank_count
+        - general_hospital_count
+        - hospital_count
+        - pharmacy_count
+        - kindergarten_count
+        - elementary_school_count
+        - middle_school_count
+        - high_school_count
+        - university_count
+        - department_store_count
+        - supermarket_count
+        - theater_count
+        - accommodation_count
+        - airport_count
+        - railway_station_count
+        - bus_terminal_count
+        - subway_station_count
+        - bus_stop_count
+      Float64: [area_sqm, area_ha, floating_population_density, resident_population_density, working_population_density, facility_density, apartment_household_share, resident_to_working_ratio]
+      boolean: [has_floating_population, has_resident_population, has_working_population, has_facilities, resident_repeated_flag, working_repeated_flag, facilities_repeated_flag]
+      datetime64[ns]: [floating_source_base_date, resident_source_base_date, working_source_base_date, facilities_source_base_date]
+
+  commercial_quarter:
+    primary_key: [quarter_code, trade_area_code, industry_code]
+    columns:
+      - quarter_code
+      - year
+      - quarter
+      - trade_area_code
+      - trade_area_name
+      - trade_area_type_code
+      - trade_area_type_name
+      - district_code
+      - district_name
+      - industry_code
+      - industry_name
+      - area_sqm
+      - area_ha
+      - total_store_count
+      - general_store_count
+      - franchise_store_count
+      - opened_store_count
+      - open_rate
+      - closed_store_count
+      - close_rate
+      - quarterly_sales_amount
+      - quarterly_sales_count
+      - weekday_sales_amount
+      - weekend_sales_amount
+      - weekday_sales_count
+      - weekend_sales_count
+      - total_floating_population
+      - total_resident_population
+      - total_working_population
+      - total_household_count
+      - apartment_household_count
+      - total_facility_count
+      - subway_station_count
+      - bus_stop_count
+      - monthly_average_sales_amount
+      - quarterly_sales_per_store
+      - monthly_average_sales_per_store
+      - quarterly_sales_count_per_store
+      - average_transaction_value
+      - sales_per_floating_population
+      - floating_population_per_store
+      - store_density
+      - franchise_share
+      - weekend_sales_share
+      - apartment_household_share
+      - resident_to_working_ratio
+      - sales_qoq_change
+      - sales_qoq_rate
+      - sales_yoy_change
+      - sales_yoy_rate
+      - store_qoq_change
+      - store_qoq_rate
+      - store_yoy_change
+      - store_yoy_rate
+      - sales_per_store_qoq_rate
+      - sales_per_store_yoy_rate
+      - floating_qoq_rate
+      - floating_yoy_rate
+      - demand_store_yoy_gap
+      - recent_4q_sales_growth_count
+      - consecutive_sales_growth_quarters
+      - has_store
+      - has_sales
+      - has_floating_population
+      - has_resident_population
+      - has_working_population
+      - has_facilities
+      - zero_store_flag
+      - zero_sales_count_flag
+      - open_rate_over_100_flag
+      - close_rate_over_100_flag
+      - core_analysis_available
+      - full_analysis_available
+      - analysis_exclusion_reason
+      - store_source_base_date
+      - sales_source_base_date
+      - floating_source_base_date
+      - resident_source_base_date
+      - working_source_base_date
+      - facilities_source_base_date
+    dtypes:
+      string: [quarter_code, trade_area_code, trade_area_name, trade_area_type_code, district_code, district_name, industry_code, analysis_exclusion_reason]
+      category: [trade_area_type_name, industry_name]
+      Int64:
+        - year
+        - quarter
+        - total_store_count
+        - general_store_count
+        - franchise_store_count
+        - opened_store_count
+        - closed_store_count
+        - quarterly_sales_amount
+        - quarterly_sales_count
+        - weekday_sales_amount
+        - weekend_sales_amount
+        - weekday_sales_count
+        - weekend_sales_count
+        - total_floating_population
+        - total_resident_population
+        - total_working_population
+        - total_household_count
+        - apartment_household_count
+        - total_facility_count
+        - subway_station_count
+        - bus_stop_count
+        - sales_qoq_change
+        - sales_yoy_change
+        - store_qoq_change
+        - store_yoy_change
+        - recent_4q_sales_growth_count
+        - consecutive_sales_growth_quarters
+      Float64:
+        - area_sqm
+        - area_ha
+        - open_rate
+        - close_rate
+        - monthly_average_sales_amount
+        - quarterly_sales_per_store
+        - monthly_average_sales_per_store
+        - quarterly_sales_count_per_store
+        - average_transaction_value
+        - sales_per_floating_population
+        - floating_population_per_store
+        - store_density
+        - franchise_share
+        - weekend_sales_share
+        - apartment_household_share
+        - resident_to_working_ratio
+        - sales_qoq_rate
+        - sales_yoy_rate
+        - store_qoq_rate
+        - store_yoy_rate
+        - sales_per_store_qoq_rate
+        - sales_per_store_yoy_rate
+        - floating_qoq_rate
+        - floating_yoy_rate
+        - demand_store_yoy_gap
+      boolean: [has_store, has_sales, has_floating_population, has_resident_population, has_working_population, has_facilities, zero_store_flag, zero_sales_count_flag, open_rate_over_100_flag, close_rate_over_100_flag, core_analysis_available, full_analysis_available]
+      datetime64[ns]: [store_source_base_date, sales_source_base_date, floating_source_base_date, resident_source_base_date, working_source_base_date, facilities_source_base_date]
+
+  segment_comparison:
+    primary_key: [quarter_code, trade_area_code, industry_code, segment_type, segment_code]
+    columns: [quarter_code, trade_area_code, trade_area_name, industry_code, industry_name, segment_type, segment_code, segment_name, segment_order, sales_amount, sales_count, floating_population, sales_amount_share, sales_count_share, floating_population_share, sales_amount_coverage, sales_count_coverage, comparison_available, comparison_exclusion_reason, sales_floating_share_gap, sales_floating_share_ratio]
+    dtypes:
+      category: [quarter_code, trade_area_code, trade_area_name, industry_code, industry_name, segment_type, segment_code, segment_name, comparison_exclusion_reason]
+      Int64: [segment_order, sales_amount, sales_count, floating_population]
+      Float64: [sales_amount_share, sales_count_share, floating_population_share, sales_amount_coverage, sales_count_coverage, sales_floating_share_gap, sales_floating_share_ratio]
+      boolean: [comparison_available]
+
+  data_quality:
+    primary_key: [dataset_name, quarter_code]
+    columns: [dataset_name, quarter_code, row_count, column_count, missing_key_count, duplicate_key_count, missing_value_count, negative_value_count, invalid_value_count, join_target, join_success_count, join_success_rate, component_mismatch_count, component_max_difference, repeated_value_rate, quality_status, quality_note]
+    dtypes:
+      string: [dataset_name, quarter_code, join_target, quality_note]
+      category: [quality_status]
+      Int64: [row_count, column_count, missing_key_count, duplicate_key_count, missing_value_count, negative_value_count, invalid_value_count, join_success_count, component_mismatch_count]
+      Float64: [join_success_rate, component_max_difference, repeated_value_rate]
