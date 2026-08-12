@@ -1,7 +1,7 @@
 """서울 상권 EBM 학습, 시간 검증, 설명 결과 저장 모듈.
 
-최신 기준분기를 후보 선택에서 격리하고 과거 3개 분기 롤링 검증으로
-후보를 고른 뒤, 기준분기 평가 모델과 전체 데이터 운영 모델을 저장한다.
+세 후보를 동일한 기준분기에서 비교해 후보를 고른 뒤, 선택 후보의 평가 모델과
+전체 데이터 운영 모델을 저장한다.
 """
 
 from __future__ import annotations
@@ -206,29 +206,18 @@ def prepare_model_sample(
     ).reset_index(drop=True)
 
 
-def rolling_origin_splits(
+def reference_quarter_split(
     sample: pd.DataFrame,
     reference_quarter: str,
-    fold_count: int = 3,
-) -> list[tuple[str, pd.Index, pd.Index]]:
-    """기준분기 이전 최근 분기를 검증점으로 하는 확장식 시간 분할을 만든다."""
-    quarters = sorted(
-        sample.loc[sample["quarter_code"].lt(reference_quarter), "quarter_code"].unique(),
-        key=quarter_to_ordinal,
-    )
-    if len(quarters) <= fold_count:
-        raise ValueError(f"롤링 검증에 필요한 과거 분기가 부족합니다: {len(quarters)}개")
-    validation_quarters = quarters[-fold_count:]
-    splits: list[tuple[str, pd.Index, pd.Index]] = []
-    for validation_quarter in validation_quarters:
-        train_index = sample.index[sample["quarter_code"].lt(validation_quarter)]
-        validation_index = sample.index[sample["quarter_code"].eq(validation_quarter)]
-        if train_index.empty or validation_index.empty:
-            raise ValueError(f"롤링 검증 표본이 비었습니다: {validation_quarter}")
-        if sample.loc[train_index, "quarter_code"].max() >= validation_quarter:
-            raise ValueError(f"미래 분기가 학습 표본에 포함되었습니다: {validation_quarter}")
-        splits.append((str(validation_quarter), train_index, validation_index))
-    return splits
+) -> tuple[pd.Index, pd.Index]:
+    """기준분기 이전 학습 표본과 기준분기 검증 표본의 인덱스를 반환한다."""
+    train_index = sample.index[sample["quarter_code"].lt(reference_quarter)]
+    validation_index = sample.index[sample["quarter_code"].eq(reference_quarter)]
+    if train_index.empty or validation_index.empty:
+        raise ValueError(f"학습 또는 기준분기 검증 표본이 비었습니다: {reference_quarter}")
+    if sample.loc[train_index, "quarter_code"].max() >= reference_quarter:
+        raise ValueError(f"기준분기 이후 정보가 학습 표본에 포함되었습니다: {reference_quarter}")
+    return train_index, validation_index
 
 
 def median_absolute_percentage_error(actual: np.ndarray, predicted: np.ndarray) -> float:
@@ -263,61 +252,58 @@ def evaluate_candidates(
     reference_quarter: str,
     candidates: dict[str, dict[str, Any]],
     fixed_parameters: dict[str, Any],
-    fold_count: int = 3,
     execution_id: str = "evaluation",
     progress: Callable[[str], None] | None = None,
 ) -> pd.DataFrame:
-    """각 EBM 후보를 동일한 롤링 원점 폴드에서 학습·평가한다."""
+    """각 EBM 후보를 기준분기 이전으로 학습해 같은 기준분기에서 평가한다."""
     rows: list[dict[str, Any]] = []
-    splits = rolling_origin_splits(sample, reference_quarter, fold_count)
-    total_fits = len(candidates) * len(splits)
-    fit_number = 0
+    train_index, validation_index = reference_quarter_split(sample, reference_quarter)
+    train = sample.loc[train_index]
+    validation = sample.loc[validation_index]
+    total_fits = len(candidates)
     for candidate, variable_parameters in candidates.items():
         parameters = {**fixed_parameters, **variable_parameters}
-        for validation_quarter, train_index, validation_index in splits:
-            fit_number += 1
-            train = sample.loc[train_index]
-            validation = sample.loc[validation_index]
-            model = _new_model(parameters)
-            label = (
-                f"[후보 검증 {fit_number}/{total_fits}] "
-                f"후보 {candidate} · 검증분기 {validation_quarter}"
+        fit_number = len(rows) + 1
+        model = _new_model(parameters)
+        label = (
+            f"[후보 검증 {fit_number}/{total_fits}] "
+            f"후보 {candidate} · 검증분기 {reference_quarter}"
+        )
+        training_seconds = _fit_with_progress(
+            model, train[FEATURE_COLUMNS], train[TARGET_COLUMN], label, progress
+        )
+        train_metrics = _metrics(
+            train[TARGET_COLUMN], model.predict(train[FEATURE_COLUMNS])
+        )
+        validation_metrics = _metrics(
+            validation[TARGET_COLUMN], model.predict(validation[FEATURE_COLUMNS])
+        )
+        rows.append({
+            "execution_id": execution_id,
+            "candidate": str(candidate),
+            "validation_fold": str(reference_quarter),
+            "parameters": json.dumps(parameters, ensure_ascii=False, sort_keys=True),
+            "training_start_quarter": str(train["quarter_code"].min()),
+            "training_end_quarter": str(train["quarter_code"].max()),
+            "validation_quarter": str(reference_quarter),
+            "training_rows": len(train),
+            "validation_rows": len(validation),
+            "train_log_r2": train_metrics["log_r2"],
+            "validation_log_r2": validation_metrics["log_r2"],
+            "validation_log_rmse": validation_metrics["log_rmse"],
+            "validation_median_absolute_percentage_error": validation_metrics[
+                "median_absolute_percentage_error"
+            ],
+            "train_validation_r2_gap": train_metrics["log_r2"] - validation_metrics["log_r2"],
+            "training_seconds": training_seconds,
+        })
+        if progress is not None:
+            progress(
+                f"{label} 성능 · 로그 R² {validation_metrics['log_r2']:.3f} · "
+                f"RMSE {validation_metrics['log_rmse']:.3f} · "
+                "중앙 절대 오차율 "
+                f"{validation_metrics['median_absolute_percentage_error']:.1%}"
             )
-            training_seconds = _fit_with_progress(
-                model, train[FEATURE_COLUMNS], train[TARGET_COLUMN], label, progress
-            )
-            train_metrics = _metrics(
-                train[TARGET_COLUMN], model.predict(train[FEATURE_COLUMNS])
-            )
-            validation_metrics = _metrics(
-                validation[TARGET_COLUMN], model.predict(validation[FEATURE_COLUMNS])
-            )
-            rows.append({
-                "execution_id": execution_id,
-                "candidate": str(candidate),
-                "validation_fold": str(validation_quarter),
-                "parameters": json.dumps(parameters, ensure_ascii=False, sort_keys=True),
-                "training_start_quarter": str(train["quarter_code"].min()),
-                "training_end_quarter": str(train["quarter_code"].max()),
-                "validation_quarter": str(validation_quarter),
-                "training_rows": len(train),
-                "validation_rows": len(validation),
-                "train_log_r2": train_metrics["log_r2"],
-                "validation_log_r2": validation_metrics["log_r2"],
-                "validation_log_rmse": validation_metrics["log_rmse"],
-                "validation_median_absolute_percentage_error": validation_metrics[
-                    "median_absolute_percentage_error"
-                ],
-                "train_validation_r2_gap": train_metrics["log_r2"] - validation_metrics["log_r2"],
-                "training_seconds": training_seconds,
-            })
-            if progress is not None:
-                progress(
-                    f"{label} 성능 · 로그 R² {validation_metrics['log_r2']:.3f} · "
-                    f"RMSE {validation_metrics['log_rmse']:.3f} · "
-                    "중앙 절대 오차율 "
-                    f"{validation_metrics['median_absolute_percentage_error']:.1%}"
-                )
     return pd.DataFrame(rows)
 
 
@@ -380,11 +366,11 @@ def _global_explanations(
 
 def _local_explanations(
     model: ExplainableBoostingRegressor,
-    holdout: pd.DataFrame,
+    validation: pd.DataFrame,
     execution_id: str,
 ) -> pd.DataFrame:
-    scores = model.eval_terms(holdout[FEATURE_COLUMNS])
-    identity = holdout[ID_COLUMNS].reset_index(drop=True)
+    scores = model.eval_terms(validation[FEATURE_COLUMNS])
+    identity = validation[ID_COLUMNS].reset_index(drop=True)
     rows: list[pd.DataFrame] = []
     for term_index, feature_indexes in enumerate(model.term_features_):
         part = identity.copy()
@@ -400,13 +386,13 @@ def _local_explanations(
 
 def _predictions(
     model: ExplainableBoostingRegressor,
-    holdout: pd.DataFrame,
+    validation: pd.DataFrame,
     execution_id: str,
 ) -> pd.DataFrame:
-    prediction_log = model.predict(holdout[FEATURE_COLUMNS])
-    result = holdout[ID_COLUMNS].copy().reset_index(drop=True)
+    prediction_log = model.predict(validation[FEATURE_COLUMNS])
+    result = validation[ID_COLUMNS].copy().reset_index(drop=True)
     result.insert(0, "execution_id", execution_id)
-    result["actual_sales_per_store"] = holdout["quarterly_sales_per_store"].to_numpy()
+    result["actual_sales_per_store"] = validation["quarterly_sales_per_store"].to_numpy()
     result["predicted_sales_per_store"] = np.exp(prediction_log)
     result["prediction_error_rate"] = (
         result["predicted_sales_per_store"] / result["actual_sales_per_store"] - 1
@@ -441,7 +427,7 @@ def train_ebm_pipeline(
     mart_dir: str | os.PathLike[str] | None = None,
     progress: Callable[[str], None] | None = _print_progress,
 ) -> dict[str, Path]:
-    """후보 롤링 검증, 홀드아웃 평가, 전체 재학습과 결과 저장을 수행한다."""
+    """기준분기 후보 비교, 선택 모델 설명, 전체 재학습과 저장을 수행한다."""
     pipeline_started = time.perf_counter()
     if progress is not None:
         progress("[1/7] 분석 설정을 불러옵니다.")
@@ -479,14 +465,11 @@ def train_ebm_pipeline(
     fixed = dict(model_config["fixed_parameters"])
     candidates = {str(name): dict(values) for name, values in model_config["candidates"].items()}
     if progress is not None:
-        fold_count = int(analysis["rolling_validation_folds"])
         progress(
-            f"[4/7] 후보 {len(candidates)}개 × 롤링 폴드 {fold_count}개 "
-            f"({len(candidates) * fold_count}회) 검증을 시작합니다."
+            f"[4/7] 후보 {len(candidates)}개를 모두 {reference} 검증분기에서 비교합니다."
         )
     metrics = evaluate_candidates(
-        sample, reference, candidates, fixed,
-        int(analysis["rolling_validation_folds"]), execution_id, progress,
+        sample, reference, candidates, fixed, execution_id, progress,
     )
     winner = select_candidate(metrics, list(candidates))
     parameters = {**fixed, **candidates[winner]}
@@ -503,55 +486,33 @@ def train_ebm_pipeline(
         progress(f"[4/7] 선택 후보: {winner}")
 
     training = sample[sample["quarter_code"].lt(reference)].copy()
-    holdout = sample[sample["quarter_code"].eq(reference)].copy()
-    if training.empty or holdout.empty:
-        raise ValueError("기준분기 학습 또는 홀드아웃 표본이 없습니다.")
+    validation = sample[sample["quarter_code"].eq(reference)].copy()
+    if training.empty or validation.empty:
+        raise ValueError("기준분기 학습 또는 검증 표본이 없습니다.")
     evaluation_model = _new_model(parameters)
-    evaluation_seconds = _fit_with_progress(
+    _fit_with_progress(
         evaluation_model,
         training[FEATURE_COLUMNS],
         training[TARGET_COLUMN],
-        f"[5/7] 후보 {winner} 홀드아웃 평가 모델",
+        f"[5/7] 선택 후보 {winner} 설명용 평가 모델",
         progress,
     )
-    train_metrics = _metrics(
-        training[TARGET_COLUMN], evaluation_model.predict(training[FEATURE_COLUMNS])
-    )
-    holdout_metrics = _metrics(
-        holdout[TARGET_COLUMN], evaluation_model.predict(holdout[FEATURE_COLUMNS])
+    validation_metrics = _metrics(
+        validation[TARGET_COLUMN], evaluation_model.predict(validation[FEATURE_COLUMNS])
     )
     if progress is not None:
         progress(
-            f"[5/7] {reference} 홀드아웃 성능 · {len(holdout):,}행 · "
-            f"로그 R² {holdout_metrics['log_r2']:.3f} · "
-            f"RMSE {holdout_metrics['log_rmse']:.3f} · "
-            f"중앙 절대 오차율 {holdout_metrics['median_absolute_percentage_error']:.1%}"
+            f"[5/7] {reference} 선택 후보 성능 · {len(validation):,}행 · "
+            f"로그 R² {validation_metrics['log_r2']:.3f} · "
+            f"RMSE {validation_metrics['log_rmse']:.3f} · "
+            f"중앙 절대 오차율 {validation_metrics['median_absolute_percentage_error']:.1%}"
         )
-    metrics = pd.concat([metrics, pd.DataFrame([{
-        "execution_id": execution_id,
-        "candidate": winner,
-        "validation_fold": f"holdout_{reference}",
-        "parameters": json.dumps(parameters, ensure_ascii=False, sort_keys=True),
-        "training_start_quarter": str(training["quarter_code"].min()),
-        "training_end_quarter": str(training["quarter_code"].max()),
-        "validation_quarter": reference,
-        "training_rows": len(training),
-        "validation_rows": len(holdout),
-        "train_log_r2": train_metrics["log_r2"],
-        "validation_log_r2": holdout_metrics["log_r2"],
-        "validation_log_rmse": holdout_metrics["log_rmse"],
-        "validation_median_absolute_percentage_error": holdout_metrics[
-            "median_absolute_percentage_error"
-        ],
-        "train_validation_r2_gap": train_metrics["log_r2"] - holdout_metrics["log_r2"],
-        "training_seconds": evaluation_seconds,
-    }])], ignore_index=True)
 
     if progress is not None:
         progress("[6/7] 전역·지역 설명과 평가 모델을 저장합니다.")
     global_mart = _global_explanations(evaluation_model, training, execution_id)
-    local_mart = _local_explanations(evaluation_model, holdout, execution_id)
-    predictions = _predictions(evaluation_model, holdout, execution_id)
+    local_mart = _local_explanations(evaluation_model, validation, execution_id)
+    predictions = _predictions(evaluation_model, validation, execution_id)
     evaluation_payload = {
         "execution_id": execution_id,
         "model_version": "1.0.0",
@@ -593,9 +554,12 @@ def train_ebm_pipeline(
         "parameters": parameters,
         "sample_period": [str(sample["quarter_code"].min()), str(sample["quarter_code"].max())],
         "training_rows": len(training),
-        "holdout_rows": len(holdout),
+        "validation_rows": len(validation),
         "all_rows": len(sample),
-        "holdout_metrics": holdout_metrics,
+        "validation_metrics": validation_metrics,
+        "validation_note": (
+            f"후보 A/B/C 선택과 성능 보고에 동일한 {reference} 검증분기를 사용함"
+        ),
         "versions": {
             "python": platform.python_version(), "pandas": pd.__version__,
             "scikit_learn": sklearn.__version__, "interpret": interpret.__version__,

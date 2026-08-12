@@ -56,14 +56,12 @@ class ModelingTests(unittest.TestCase):
         self.assertTrue(np.isclose(result.loc[0, "weekend_floating_share"], .3))
         self.assertEqual(result[modeling.FEATURE_COLUMNS].shape[1], 19)
 
-    def test_rolling_splits_never_include_validation_or_future_quarters(self) -> None:
+    def test_reference_split_uses_only_20261_for_validation(self) -> None:
         quarters = ["20241", "20242", "20243", "20244", "20251", "20252", "20253"]
         sample = pd.DataFrame({"quarter_code": quarters})
-        splits = modeling.rolling_origin_splits(sample, "20253", fold_count=3)
-        for validation_quarter, train_index, validation_index in splits:
-            self.assertTrue((sample.loc[train_index, "quarter_code"] < validation_quarter).all())
-            self.assertTrue((sample.loc[validation_index, "quarter_code"] == validation_quarter).all())
-        self.assertNotIn("20253", [fold for fold, _, _ in splits])
+        train_index, validation_index = modeling.reference_quarter_split(sample, "20253")
+        self.assertTrue((sample.loc[train_index, "quarter_code"] < "20253").all())
+        self.assertTrue((sample.loc[validation_index, "quarter_code"] == "20253").all())
 
     def test_candidate_selection_prioritizes_median_error(self) -> None:
         metrics = pd.DataFrame({

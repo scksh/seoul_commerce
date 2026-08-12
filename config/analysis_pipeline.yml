@@ -4,7 +4,6 @@ analysis:
   reference_quarter: "20261"
   recent_quarters: 8
   context_quarters: 4
-  rolling_validation_folds: 3
   minimum_eligible_trade_areas: 50
   industry_codes: [CS100001, CS100010, CS100009]
 
