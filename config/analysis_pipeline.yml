@@ -1,0 +1,84 @@
+schema_version: "1.0.0"
+
+analysis:
+  reference_quarter: "20261"
+  recent_quarters: 8
+  context_quarters: 4
+  rolling_validation_folds: 3
+  minimum_eligible_trade_areas: 50
+  industry_codes: [CS100001, CS100010, CS100009]
+
+paths:
+  commercial_quarter: data/analysis/english/commercial_quarter.csv
+  trade_area_master: data/analysis/english/trade_area_master.csv
+  segment_comparison: data/analysis/english/segment_comparison.csv
+  mart_dir: data/mart
+  model_dir: outputs/models
+
+mart_files:
+  summary: dashboard_summary.csv
+  trend: dashboard_trend.csv
+  segments: dashboard_segments.csv
+  competition: dashboard_competition.csv
+  context: dashboard_context.csv
+  model_metrics: model_metrics.csv
+  model_global: dashboard_model_global.csv
+  model_local: dashboard_model_local.csv
+
+density_groups: [low, lower_middle, middle, upper_middle, high]
+
+context_metrics:
+  - {domain: usage_time, column: weekend_floating_share, label: weekend_floating_share, scale: 100, unit: percent}
+  - {domain: usage_time, column: lunch_floating_share, label: lunch_floating_share, scale: 100, unit: percent}
+  - {domain: usage_time, column: evening_floating_share, label: evening_floating_share, scale: 100, unit: percent}
+  - {domain: usage_time, column: late_night_floating_share, label: late_night_floating_share, scale: 100, unit: percent}
+  - {domain: hinterland, column: total_resident_population, label: resident_population, scale: 1, unit: people}
+  - {domain: hinterland, column: total_working_population, label: working_population, scale: 1, unit: people}
+  - {domain: hinterland, column: resident_to_working_ratio, label: resident_to_working_ratio, scale: 1, unit: ratio}
+  - {domain: housing, column: total_household_count, label: household_count, scale: 1, unit: households}
+  - {domain: housing, column: apartment_household_share, label: apartment_household_share, scale: 100, unit: percent}
+  - {domain: access, column: facility_density, label: facility_density, scale: 1, unit: facilities_per_ha}
+  - {domain: access, column: subway_station_count, label: subway_station_count, scale: 1, unit: count}
+  - {domain: access, column: bus_stop_count, label: bus_stop_count, scale: 1, unit: count}
+  - {domain: competition, column: store_density, label: store_density, scale: 1, unit: stores_per_ha}
+  - {domain: competition, column: franchise_share, label: franchise_share, scale: 100, unit: percent}
+
+model:
+  target_column: log_quarterly_sales_per_store
+  fixed_parameters:
+    interactions: 1x
+    validation_size: 0.15
+    max_leaves: 3
+    random_state: 42
+    n_jobs: -2
+  candidates:
+    A:
+      max_bins: 256
+      max_interaction_bins: 32
+      outer_bags: 8
+      learning_rate: 0.03
+      max_rounds: 8000
+      early_stopping_rounds: 100
+      min_samples_leaf: 20
+      smoothing_rounds: 300
+      interaction_smoothing_rounds: 100
+    B:
+      max_bins: 128
+      max_interaction_bins: 16
+      outer_bags: 12
+      learning_rate: 0.02
+      max_rounds: 10000
+      early_stopping_rounds: 150
+      min_samples_leaf: 40
+      smoothing_rounds: 400
+      interaction_smoothing_rounds: 150
+    C:
+      max_bins: 512
+      max_interaction_bins: 64
+      outer_bags: 8
+      learning_rate: 0.04
+      max_rounds: 6000
+      early_stopping_rounds: 80
+      min_samples_leaf: 10
+      smoothing_rounds: 200
+      interaction_smoothing_rounds: 75

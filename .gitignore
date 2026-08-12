@@ -16,3 +16,6 @@ wheels/
 
 # Generated data copies
 data/
+
+# Trained models and evaluation artifacts
+outputs/

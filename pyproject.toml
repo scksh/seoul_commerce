@@ -9,6 +9,8 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "ipykernel>=7.3.0",
+    "interpret-core>=0.7.8",
+    "joblib>=1.5.3",
     "jupyter>=1.1.1",
     "matplotlib>=3.11.1",
     "pandas>=3.0.5",
@@ -28,6 +30,8 @@ dependencies = [
 seoul-commerce = "seoul_commerce.collector:main"
 seoul-commerce-korean = "seoul_commerce.column_translator:main"
 seoul-commerce-preprocess = "seoul_commerce.preprocessing:main"
+seoul-commerce-build-marts = "seoul_commerce.analysis_mart:main"
+seoul-commerce-train-ebm = "seoul_commerce.modeling:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
