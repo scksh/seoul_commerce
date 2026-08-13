@@ -1,0 +1,192 @@
+schema_version: "1.0.0"
+
+files:
+  dashboard_summary.csv: 대시보드_요약.csv
+  dashboard_trend.csv: 대시보드_추세.csv
+  dashboard_segments.csv: 대시보드_구성비.csv
+  dashboard_competition.csv: 대시보드_경쟁.csv
+  dashboard_context.csv: 대시보드_환경.csv
+  model_metrics.csv: 모델_성능.csv
+  dashboard_model_global.csv: 대시보드_모델_전체설명.csv
+  dashboard_model_local.csv: 대시보드_모델_개별설명.csv
+
+# analysis_column_mapping_ko.yml의 공통 분석 컬럼에 아래 마트 전용 컬럼을 합친다.
+columns:
+  base_quarter: 기준_년분기_코드
+  quarter_code: 데이터_년분기_코드
+  observed_quarter: 관측_년분기_코드
+  total_sales_rank: 총매출_순위
+  sales_per_store_rank: 점포당매출_순위
+  total_sales_peer_percentile: 총매출_동일유형_백분위
+  sales_per_store_peer_percentile: 점포당매출_동일유형_백분위
+  peer_trade_area_count: 동일유형_상권_수
+  commercial_history_complete: 상권업종_이력_완전_여부
+  segment_history_complete: 구성비_이력_완전_여부
+  eligible: 분석_적격_여부
+  eligible_trade_area_count: 분석_적격_상권_수
+  minimum_trade_areas_met: 최소_상권_수_충족_여부
+  report_available: 리포트_제공_가능_여부
+  availability_reason: 리포트_제공_상태_사유
+  store_log_contribution: 점포수_로그_변화_기여
+  volume_log_contribution: 거래량_로그_변화_기여
+  ticket_log_contribution: 객단가_로그_변화_기여
+  total_sales_log_change: 총매출_로그_변화
+  growth_type: 성장_유형
+  quarterly_trend_rate: 분기_추세율
+  sales_yoy_volatility: 매출_전년동기_증감률_변동성
+  density_group: 점포밀도_그룹
+  context_bus_stop_count: 환경_버스정류장_수
+  context_evening_floating_share: 환경_저녁_유동인구_비중
+  context_facility_density: 환경_집객시설_밀도
+  context_franchise_share: 환경_프랜차이즈_비중
+  context_household_count: 환경_가구_수
+  context_late_night_floating_share: 환경_심야_유동인구_비중
+  context_lunch_floating_share: 환경_점심_유동인구_비중
+  context_resident_population: 환경_상주인구_수
+  context_resident_to_working_ratio: 환경_상주인구_대비_직장인구_비율
+  context_store_density: 환경_점포_밀도
+  context_subway_station_count: 환경_지하철역_수
+  context_weekend_floating_share: 환경_주말_유동인구_비중
+  context_working_population: 환경_직장인구_수
+  context_bus_stop_count_percentile: 환경_버스정류장_수_백분위
+  context_evening_floating_share_percentile: 환경_저녁_유동인구_비중_백분위
+  context_facility_density_percentile: 환경_집객시설_밀도_백분위
+  context_franchise_share_percentile: 환경_프랜차이즈_비중_백분위
+  context_household_count_percentile: 환경_가구_수_백분위
+  context_late_night_floating_share_percentile: 환경_심야_유동인구_비중_백분위
+  context_lunch_floating_share_percentile: 환경_점심_유동인구_비중_백분위
+  context_resident_population_percentile: 환경_상주인구_수_백분위
+  context_resident_to_working_ratio_percentile: 환경_상주인구_대비_직장인구_비율_백분위
+  context_store_density_percentile: 환경_점포_밀도_백분위
+  context_subway_station_count_percentile: 환경_지하철역_수_백분위
+  context_weekend_floating_share_percentile: 환경_주말_유동인구_비중_백분위
+  context_working_population_percentile: 환경_직장인구_수_백분위
+  actual_sales_per_store: 실제_점포당_매출
+  predicted_sales_per_store: 예측_점포당_매출
+  prediction_error_rate: 예측_오차율
+  sample_count: 표본_수
+  density_min: 점포밀도_최솟값
+  density_median: 점포밀도_중앙값
+  density_max: 점포밀도_최댓값
+  total_sales_median: 총매출_중앙값
+  sales_per_store_median: 점포당매출_중앙값
+  domain: 영역
+  metric: 지표
+  value: 값
+  unit: 단위
+  peer_percentile: 동일유형_백분위
+  composition_distance: 구성비_거리
+  execution_id: 실행_ID
+  candidate: 후보
+  validation_fold: 검증_폴드
+  parameters: 매개변수
+  training_start_quarter: 학습_시작_년분기
+  training_end_quarter: 학습_종료_년분기
+  validation_quarter: 검증_년분기
+  training_rows: 학습_행_수
+  validation_rows: 검증_행_수
+  train_log_r2: 학습_로그_R2
+  validation_log_r2: 검증_로그_R2
+  validation_log_rmse: 검증_로그_RMSE
+  validation_median_absolute_percentage_error: 검증_중앙_절대_백분율_오차
+  train_validation_r2_gap: 학습_검증_R2_차이
+  training_seconds: 학습_초
+  term: 항
+  term_type: 항_유형
+  role: 역할
+  importance: 중요도
+  importance_share: 중요도_비중
+  high_20_low_20_prediction_difference: 상위20_하위20_예측_차이
+  term_index: 항_인덱스
+  log_contribution: 로그_기여값
+  sales_ratio_contribution: 매출_비율_기여값
+
+values:
+  density_group:
+    low: 낮음
+    lower_middle: 중하
+    middle: 중간
+    upper_middle: 중상
+    high: 높음
+  domain:
+    access: 접근성
+    competition: 경쟁
+    demand: 수요
+    district_control: 자치구_통제
+    hinterland: 배후수요
+    housing: 주거
+    industry_control: 업종_통제
+    interaction: 상호작용
+    season_control: 계절_통제
+    time_control: 시간_통제
+    trade_area_structure: 상권_구조
+    type_control: 상권유형_통제
+    usage_time: 이용시간
+  role:
+    analysis_factor: 분석_요인
+    control: 통제_요인
+  term_type:
+    main: 주효과
+    interaction: 상호작용
+  unit:
+    count: 개
+    facilities_per_ha: 개_퍼_헥타르
+    households: 가구
+    people: 명
+    percent: 퍼센트
+    ratio: 비율
+    stores_per_ha: 점포_퍼_헥타르
+  availability_reason:
+    available: 제공_가능
+    incomplete_commercial_history: 상권업종_이력_불완전
+  growth_type:
+    decline_or_stagnation: 감소_또는_정체
+    joint_growth: 동반_성장
+    store_expansion: 점포_확장
+    ticket_growth: 객단가_성장
+    transaction_growth: 거래량_성장
+    unavailable: 산출_불가
+  comparison_exclusion_reason:
+    missing_floating_segment: 유동인구_구성_누락
+  analysis_exclusion_reason:
+    missing_facilities: 집객시설_누락
+    missing_floating_population: 유동인구_누락
+    missing_resident_population: 상주인구_누락
+    missing_sales: 매출_누락
+    missing_working_population: 직장인구_누락
+    zero_store_count: 점포수_0
+  metric:
+    bus_stop_count: 버스정류장_수
+    evening_floating_share: 저녁_유동인구_비중
+    facility_density: 집객시설_밀도
+    franchise_share: 프랜차이즈_비중
+    household_count: 가구_수
+    late_night_floating_share: 심야_유동인구_비중
+    lunch_floating_share: 점심_유동인구_비중
+    resident_population: 상주인구_수
+    resident_to_working_ratio: 상주인구_대비_직장인구_비율
+    store_density: 점포_밀도
+    subway_station_count: 지하철역_수
+    weekend_floating_share: 주말_유동인구_비중
+    working_population: 직장인구_수
+
+terms:
+  log_floating_population: 유동인구_로그
+  log_resident_population: 상주인구_로그
+  log_working_population: 직장인구_로그
+  log_household_count: 가구수_로그
+  weekend_floating_share: 주말_유동인구_비중
+  lunch_floating_share: 점심_유동인구_비중
+  evening_floating_share: 저녁_유동인구_비중
+  late_night_floating_share: 심야_유동인구_비중
+  log_area_ha: 상권면적_로그
+  log_facility_density: 집객시설밀도_로그
+  subway_station_count: 지하철역_수
+  bus_stop_count: 버스정류장_수
+  log_store_density: 점포밀도_로그
+  franchise_share: 프랜차이즈_비중
+  time_index: 시간_지수
+  industry: 업종
+  district: 자치구
+  trade_area_type: 상권_유형
+  quarter: 분기

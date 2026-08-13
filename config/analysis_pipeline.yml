@@ -5,7 +5,17 @@ analysis:
   recent_quarters: 8
   context_quarters: 4
   minimum_eligible_trade_areas: 50
-  industry_codes: [CS100001, CS100010, CS100009]
+  industry_codes:
+    - CS100001
+    - CS100002
+    - CS100003
+    - CS100004
+    - CS100005
+    - CS100006
+    - CS100007
+    - CS100008
+    - CS100009
+    - CS100010
 
 paths:
   commercial_quarter: data/analysis/english/commercial_quarter.csv

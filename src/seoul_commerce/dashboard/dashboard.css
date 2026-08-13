@@ -1,0 +1,101 @@
+:root {
+  --dashboard-blue: #1677ff;
+  --dashboard-navy: #172554;
+  --dashboard-ink: #1e293b;
+  --dashboard-muted: #64748b;
+  --dashboard-border: #dbe4ef;
+  --dashboard-surface: #ffffff;
+  --dashboard-bg: #f4f7fb;
+  --dashboard-accent: #f72585;
+}
+
+[data-testid="stAppViewContainer"] {
+  background: var(--dashboard-bg);
+}
+
+[data-testid="stHeader"] {
+  background: transparent;
+}
+
+.block-container {
+  max-width: 1760px;
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.dashboard-header {
+  background: linear-gradient(115deg, #0866d9 0%, #1687ff 65%, #42a5ff 100%);
+  border-radius: 18px;
+  color: #fff;
+  margin-bottom: 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 14px 32px rgba(22, 119, 255, 0.18);
+}
+
+.dashboard-header h1 {
+  color: #fff;
+  font-size: 1.75rem;
+  letter-spacing: -0.04em;
+  margin: 0.1rem 0 0;
+}
+
+.dashboard-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  opacity: 0.76;
+}
+
+.section-label {
+  color: var(--dashboard-navy);
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0.2rem 0 0.7rem;
+}
+
+.st-key-exploration-filters {
+  background: var(--dashboard-surface);
+  height: 100%;
+}
+
+.st-key-exploration-map,
+[data-testid="stLayoutWrapper"]:has(> .st-key-exploration-map) {
+  flex: 1 1 auto !important;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
+.st-key-exploration-map {
+  overflow: hidden;
+}
+
+.st-key-exploration-map > [data-testid="stElementContainer"],
+.st-key-exploration-map > [data-testid="stElementContainer"] > div,
+.st-key-exploration-map iframe {
+  height: 100% !important;
+}
+
+[data-testid="stCustomComponentV1"] iframe {
+  border: 1px solid var(--dashboard-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(30, 41, 59, 0.07);
+}
+
+.st-key-selected-area-report {
+  background: var(--dashboard-surface);
+}
+
+.st-key-report-header {
+  align-items: flex-start;
+}
+
+.st-key-close_selected_area_report {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+.st-key-close_selected_area_report button {
+  min-height: 2.1rem;
+  padding: 0.25rem 0.55rem;
+}

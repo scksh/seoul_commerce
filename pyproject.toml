@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "folium>=0.20.0",
     "ipykernel>=7.3.0",
     "interpret-core>=0.7.8",
     "joblib>=1.5.3",
@@ -22,9 +23,13 @@ dependencies = [
     "seaborn>=0.13.2",
     "statsmodels>=0.14.6",
     "streamlit>=1.61.1",
+    "streamlit-folium>=0.27.4",
     "tqdm>=4.67.1",
     "xmltodict>=1.0.4",
 ]
+
+[tool.uv]
+cache-dir = ".uv-cache-codex"
 
 [project.scripts]
 seoul-commerce = "seoul_commerce.collector:main"
@@ -32,6 +37,7 @@ seoul-commerce-korean = "seoul_commerce.column_translator:main"
 seoul-commerce-preprocess = "seoul_commerce.preprocessing:main"
 seoul-commerce-build-marts = "seoul_commerce.analysis_mart:main"
 seoul-commerce-train-ebm = "seoul_commerce.modeling:main"
+seoul-commerce-korean-marts = "seoul_commerce.mart_translator:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

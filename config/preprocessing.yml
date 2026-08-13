@@ -5,8 +5,15 @@ analysis_scope:
   quarter_max: "20261"
   industry_codes:
     - CS100001
-    - CS100010
+    - CS100002
+    - CS100003
+    - CS100004
+    - CS100005
+    - CS100006
+    - CS100007
+    - CS100008
     - CS100009
+    - CS100010
 
 paths:
   input_dir: data/raw

@@ -51,6 +51,13 @@ uv run seoul-commerce-train-ebm
 uv run seoul-commerce-build-marts
 ```
 
+기존 영문 분석 마트를 유지하면서 한국어 헤더와 설명값을 가진 별도 복사본을
+`data/mart/korean`에 만들려면 다음 명령을 실행합니다.
+
+```powershell
+uv run seoul-commerce-korean-marts
+```
+
 모델 학습 중에는 후보·검증 폴드별 시작과 완료, 30초 간격 경과시간, 성능,
 홀드아웃 평가와 전체 재학습 상태가 출력됩니다. 자동화 환경에서 출력을 생략하려면
 `uv run seoul-commerce-train-ebm --quiet`을 사용합니다.
