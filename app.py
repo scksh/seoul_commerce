@@ -10,6 +10,7 @@ from seoul_commerce.dashboard.exploration import build_exploration
 from seoul_commerce.dashboard.map_view import build_map, selected_area_code
 from seoul_commerce.dashboard.report import (
     build_report_view,
+    clear_ai_insight_state,
     render_report,
     render_report_error,
 )
@@ -31,6 +32,7 @@ def _initialize_state() -> None:
 
 
 def _clear_selection() -> None:
+    clear_ai_insight_state()
     st.session_state[SELECTED_AREA_KEY] = None
     st.session_state[MAP_NONCE_KEY] += 1
 
@@ -77,6 +79,7 @@ def main() -> None:
             )
             clicked_code = selected_area_code(map_event, view.top10)
             if clicked_code is not None and clicked_code != selected_code:
+                clear_ai_insight_state()
                 st.session_state[SELECTED_AREA_KEY] = clicked_code
                 st.rerun()
 

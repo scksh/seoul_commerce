@@ -32,18 +32,35 @@
   box-shadow: 0 14px 32px rgba(22, 119, 255, 0.18);
 }
 
+.dashboard-title-row {
+  align-items: center;
+  display: flex;
+  gap: 0.85rem;
+}
+
+.dashboard-logo-shell {
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 3.2rem;
+  justify-content: center;
+  width: 3.2rem;
+}
+
+.dashboard-logo-shell img {
+  display: block;
+  height: 2.45rem;
+  object-fit: contain;
+  width: 2.45rem;
+}
+
 .dashboard-header h1 {
   color: #fff;
   font-size: 1.75rem;
   letter-spacing: -0.04em;
-  margin: 0.1rem 0 0;
-}
-
-.dashboard-eyebrow {
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  opacity: 0.76;
+  margin: 0;
 }
 
 .section-label {

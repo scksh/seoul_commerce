@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 import pandas as pd
@@ -19,6 +20,7 @@ from seoul_commerce.dashboard.exploration import (
 
 
 CSS_PATH = Path(__file__).with_name("dashboard.css")
+SEOUL_LOGO_PATH = Path(__file__).with_name("seoul_logo.png")
 
 
 def configure_page() -> None:
@@ -34,11 +36,16 @@ def configure_page() -> None:
 
 
 def render_header() -> None:
+    logo_data = base64.b64encode(SEOUL_LOGO_PATH.read_bytes()).decode("ascii")
     st.markdown(
-        """
+        f"""
         <div class="dashboard-header">
-          <div class="dashboard-eyebrow">SEOUL COMMERCIAL AREA EXPLORER</div>
-          <h1>서울시 상권 분석</h1>
+          <div class="dashboard-title-row">
+            <span class="dashboard-logo-shell">
+              <img src="data:image/png;base64,{logo_data}" alt="서울시 로고">
+            </span>
+            <h1>서울시 상권 분석</h1>
+          </div>
         </div>
         """,
         unsafe_allow_html=True,

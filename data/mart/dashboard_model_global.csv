@@ -1,0 +1,39 @@
+﻿execution_id,term,term_type,domain,role,importance,importance_share,high_20_low_20_prediction_difference,term_index
+ebm-20261-1d4e86dfd495,industry,main,industry_control,control,0.5343904202422722,15.970303088832267,,15
+ebm-20261-1d4e86dfd495,log_facility_density,main,access,analysis_factor,0.22947991762263717,6.858026825354143,20.377645849600263,9
+ebm-20261-1d4e86dfd495,log_area_ha,main,trade_area_structure,analysis_factor,0.21520766086464885,6.431499220156109,31.471193309669815,8
+ebm-20261-1d4e86dfd495,log_resident_population,main,hinterland,analysis_factor,0.2063021759194499,6.165358046324098,-47.25385833295429,1
+ebm-20261-1d4e86dfd495,log_household_count,main,housing,analysis_factor,0.18228023742429286,5.4474603744777,46.520955940716114,3
+ebm-20261-1d4e86dfd495,district,main,district_control,control,0.1548902647935659,4.6289087164797555,,16
+ebm-20261-1d4e86dfd495,franchise_share,main,competition,analysis_factor,0.1353478011708231,4.044880531587916,57.43929739997273,13
+ebm-20261-1d4e86dfd495,log_store_density,main,competition,analysis_factor,0.1326459153315317,3.96413444383929,32.10408938425509,12
+ebm-20261-1d4e86dfd495,log_working_population,main,hinterland,analysis_factor,0.1293141950333298,3.864565699801221,57.76094761332751,2
+ebm-20261-1d4e86dfd495,time_index,main,time_control,control,0.08035339828027911,2.401368131135147,22.403365618656903,14
+ebm-20261-1d4e86dfd495,log_facility_density & franchise_share,interaction,interaction,analysis_factor,0.07938531670787902,2.3724369311354656,,28
+ebm-20261-1d4e86dfd495,evening_floating_share,main,usage_time,analysis_factor,0.07793233503151502,2.3290144503515986,30.7085432907588,6
+ebm-20261-1d4e86dfd495,industry & district,interaction,interaction,analysis_factor,0.0734028121747203,2.193649275133806,,36
+ebm-20261-1d4e86dfd495,lunch_floating_share,main,usage_time,analysis_factor,0.07163673597420804,2.140869937908099,20.455865704418276,5
+ebm-20261-1d4e86dfd495,log_facility_density & industry,interaction,interaction,analysis_factor,0.07003949932558098,2.0931363850281652,,29
+ebm-20261-1d4e86dfd495,late_night_floating_share,main,usage_time,analysis_factor,0.0682053011641573,2.0383212172157723,20.164161621556985,7
+ebm-20261-1d4e86dfd495,log_area_ha & industry,interaction,interaction,analysis_factor,0.06579708978825927,1.9663516157441947,,27
+ebm-20261-1d4e86dfd495,log_working_population & log_store_density,interaction,interaction,analysis_factor,0.06233739566382046,1.8629583630416282,,20
+ebm-20261-1d4e86dfd495,weekend_floating_share,main,usage_time,analysis_factor,0.0620239640135836,1.853591431558002,-16.119855919812213,4
+ebm-20261-1d4e86dfd495,late_night_floating_share & log_store_density,interaction,interaction,analysis_factor,0.061751294464986776,1.8454426789433644,,25
+ebm-20261-1d4e86dfd495,franchise_share & industry,interaction,interaction,analysis_factor,0.053120779459543306,1.587519005111114,,33
+ebm-20261-1d4e86dfd495,time_index & industry,interaction,interaction,analysis_factor,0.05048402363863101,1.5087193334925226,,35
+ebm-20261-1d4e86dfd495,bus_stop_count & industry,interaction,interaction,analysis_factor,0.04942699027819374,1.4771298017536552,,31
+ebm-20261-1d4e86dfd495,log_resident_population & industry,interaction,interaction,analysis_factor,0.04855650406662041,1.4511152473999807,,19
+ebm-20261-1d4e86dfd495,trade_area_type,main,type_control,control,0.043840500324849714,1.3101770750989135,,17
+ebm-20261-1d4e86dfd495,log_floating_population,main,demand,analysis_factor,0.043183115814588925,1.2905310831853445,-5.9722359974558925,0
+ebm-20261-1d4e86dfd495,log_working_population & industry,interaction,interaction,analysis_factor,0.042109505736542575,1.2584461548330517,,21
+ebm-20261-1d4e86dfd495,log_store_density & industry,interaction,interaction,analysis_factor,0.041975667016606426,1.2544463733223117,,32
+ebm-20261-1d4e86dfd495,quarter,main,season_control,control,0.03861952784017117,1.1541478690346123,,18
+ebm-20261-1d4e86dfd495,bus_stop_count,main,access,analysis_factor,0.0385399106822457,1.1517685035090015,-1.4531210827992485,11
+ebm-20261-1d4e86dfd495,lunch_floating_share & industry,interaction,interaction,analysis_factor,0.03585263368023043,1.0714590021029402,,23
+ebm-20261-1d4e86dfd495,evening_floating_share & industry,interaction,interaction,analysis_factor,0.03523691094440353,1.0530580758562038,,24
+ebm-20261-1d4e86dfd495,industry & trade_area_type,interaction,interaction,analysis_factor,0.030143517121738253,0.9008415689400193,,37
+ebm-20261-1d4e86dfd495,franchise_share & trade_area_type,interaction,interaction,analysis_factor,0.02435304207931793,0.727792730576026,,34
+ebm-20261-1d4e86dfd495,weekend_floating_share & industry,interaction,interaction,analysis_factor,0.02202669335647276,0.6582696014426264,,22
+ebm-20261-1d4e86dfd495,subway_station_count,main,access,analysis_factor,0.020709036893817864,0.6188913261621356,1.2370810328009794,10
+ebm-20261-1d4e86dfd495,late_night_floating_share & industry,interaction,interaction,analysis_factor,0.020423293002068403,0.6103518456921219,,26
+ebm-20261-1d4e86dfd495,subway_station_count & industry,interaction,interaction,analysis_factor,0.014825389977668838,0.4430580384396991,,30

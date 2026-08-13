@@ -9,8 +9,18 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+from seoul_commerce.config import load_openai_api_key
+from seoul_commerce.dashboard.ai_insights import (
+    AIInsight,
+    AIInsightError,
+    build_report_context,
+    generate_ai_insight,
+)
 from seoul_commerce.dashboard.data import ReportMarts
 from seoul_commerce.dashboard.exploration import LATEST_QUARTER, format_change, format_quarter
+
+
+AI_INSIGHT_STATE_PREFIX = "ai_report_insight:"
 
 
 DENSITY_LABELS = {
@@ -79,6 +89,7 @@ CONTEXT_METRIC_LABELS = {
     "franchise_share": "프랜차이즈 비중",
 }
 TERM_LABELS = {
+    "industry": "업종",
     "log_floating_population": "유동인구",
     "log_resident_population": "상주인구",
     "log_working_population": "직장인구",
@@ -115,6 +126,13 @@ $$S=N\times C\times A$$
 
 CUSTOMER_FORMULAS = r"""
 각 비중은 **기준분기·선택 상권**에서 구성 유형별로 따로 계산합니다. 매출은 선택 업종 기준이며, 유동인구는 업종 구분이 없는 상권 전체 인구입니다.
+
+**구성 유형별 구성항목**
+
+- 성별: 남성, 여성
+- 연령: 10대, 20대, 30대, 40대, 50대, 60대 이상
+- 요일: 월요일, 화요일, 수요일, 목요일, 금요일, 토요일, 일요일
+- 시간대: 00~06시, 06~11시, 11~14시, 14~17시, 17~21시, 21~24시
 
 - 매출 비중$_i$: $\frac{\text{선택 업종의 구성항목 }i\text{ 매출액}}{\sum_{j\in\text{같은 구성 유형}}\text{선택 업종의 구성항목 }j\text{ 매출액}}$
 - 유동인구 비중$_i$: $\frac{\text{구성항목 }i\text{ 유동인구}}{\sum_{j\in\text{같은 구성 유형}}\text{구성항목 }j\text{ 유동인구}}$
@@ -313,7 +331,10 @@ def build_report_view(
     report_summary = _summary_text(peer_position, trend_direction, density_display)
     tags = (
         (f"점포당 매출 {peer_position}", _peer_color(peer_percentile)),
-        (f"최근 추세 {trend_direction}", _trend_color(trend_direction)),
+        (
+            f"최근 추세 {_direction_badge(trend_direction, trend_change)}",
+            _trend_color(trend_direction),
+        ),
         (f"경쟁 밀도 {density_display}", _density_color(density_group)),
     )
     return ReportView(
@@ -630,7 +651,10 @@ def _build_model_view(
         else None
     )
 
-    selected_global = selected_global.loc[selected_global["role"].eq("analysis_factor")].copy()
+    selected_global = selected_global.loc[
+        selected_global["role"].eq("analysis_factor")
+        & selected_global["term_type"].eq("main")
+    ].copy()
     selected_global["importance_share"] = pd.to_numeric(
         selected_global["importance_share"], errors="coerce"
     )
@@ -709,6 +733,7 @@ def render_report(view: ReportView, on_close: Callable[[], None]) -> None:
     """Render the complete scrolling report below the map."""
     with st.container(border=True, key="selected-area-report"):
         _render_report_header(view, on_close)
+        _render_ai_insight_section(view)
         _render_kpis(view)
         st.divider()
         _render_growth_section(view)
@@ -720,12 +745,112 @@ def render_report(view: ReportView, on_close: Callable[[], None]) -> None:
         _render_context_section(view)
         st.divider()
         _render_model_section(view)
-        st.divider()
-        _render_review_section(view)
         st.caption(
             "추정매출과 비교지표는 후보를 좁히기 위한 참고정보이며, "
             "실제 수익성·임대료·운영역량을 보장하지 않습니다."
         )
+
+
+def _render_ai_insight_section(view: ReportView) -> None:
+    """Generate an AI synthesis only after an explicit button click."""
+    state_key = _ai_insight_state_key(view)
+    stored = st.session_state.get(state_key)
+
+    with st.container(border=True, key="ai-insight-action"):
+        with st.container(
+            horizontal=True,
+            horizontal_alignment="distribute",
+            vertical_alignment="center",
+            gap="small",
+        ):
+            with st.container(gap=None, width="stretch"):
+                st.markdown("#### AI 분석 인사이트")
+            requested = False
+            if not isinstance(stored, AIInsight):
+                requested = st.button(
+                    "AI 분석 인사이트 생성",
+                    icon=":material/auto_awesome:",
+                    type="primary",
+                    key=f"request_{state_key}",
+                    width="content",
+                )
+
+        if requested:
+            try:
+                api_key = load_openai_api_key()
+                with st.spinner("리포트 데이터를 종합해 AI 인사이트를 생성하고 있습니다..."):
+                    stored = generate_ai_insight(build_report_context(view), api_key)
+                st.session_state[state_key] = stored
+                st.rerun()
+            except (ValueError, AIInsightError) as error:
+                st.error(str(error), icon=":material/error:")
+
+        if isinstance(stored, AIInsight):
+            _render_ai_insight(stored)
+
+
+def _ai_insight_state_key(view: ReportView) -> str:
+    """Return the per-report key used to keep one generated insight."""
+    return (
+        f"{AI_INSIGHT_STATE_PREFIX}{view.trade_area_code}:"
+        f"{view.industry_code}:{view.quarter_label}"
+    )
+
+
+def clear_ai_insight_state() -> None:
+    """Forget generated insights when the active report is closed or changed."""
+    insight_keys = [
+        key
+        for key in st.session_state
+        if str(key).startswith(AI_INSIGHT_STATE_PREFIX)
+    ]
+    for key in insight_keys:
+        del st.session_state[key]
+
+
+def _render_ai_insight(insight: AIInsight) -> None:
+    """Render a structured AI response in a consistent report layout."""
+    st.divider()
+    badge_color = {
+        "긍정적": "green",
+        "중립적": "blue",
+        "주의 필요": "orange",
+        "판단 유보": "gray",
+    }.get(insight.assessment, "gray")
+    st.badge(
+        f"종합 평가 · {insight.assessment}",
+        color=badge_color,
+        icon=":material/analytics:",
+    )
+    st.markdown(f"**종합 결론**  \n{insight.overall_conclusion}")
+
+    st.markdown("**핵심 근거**")
+    for item in insight.key_evidence:
+        st.markdown(f"- {item}")
+
+    opportunity_column, risk_column = st.columns(2, gap="medium")
+    with opportunity_column:
+        st.markdown(":green[**기회 요인**]")
+        for item in insight.opportunities:
+            st.markdown(f"- {item}")
+    with risk_column:
+        st.markdown(":orange[**위험 요인**]")
+        for item in insight.risks:
+            st.markdown(f"- {item}")
+
+    st.markdown("**실행 제안**")
+    for number, item in enumerate(insight.recommended_actions, start=1):
+        st.markdown(f"{number}. {item}")
+
+    st.warning(
+        "**해석 시 유의사항**\n\n"
+        + "\n".join(f"- {item}" for item in insight.data_limitations),
+        icon=":material/info:",
+    )
+    st.caption(
+        "AI가 현재 리포트 데이터를 바탕으로 생성한 참고용 해석입니다. "
+        "출점·투자 결정 전 임대료, 현장 유동, 경쟁점과 운영 조건을 직접 확인하세요."
+    )
 
 
 def _render_report_header(view: ReportView, on_close: Callable[[], None]) -> None:
@@ -868,7 +993,11 @@ def _render_growth_section(view: ReportView) -> None:
     with growth_columns[0]:
         st.metric(
             "8분기 평균 분기 추세",
-            _format_percent(view.growth.quarterly_trend_rate),
+            _direction_value(view.growth.quarterly_trend_rate, "상승", "하락", "정체"),
+            delta=view.growth.quarterly_trend_rate,
+            delta_color="normal",
+            delta_arrow="auto",
+            format="%+.1f%%",
             width="stretch",
         )
     with growth_columns[1]:
@@ -879,17 +1008,23 @@ def _render_growth_section(view: ReportView) -> None:
         )
     with growth_columns[2]:
         recent = _format_integer(view.growth.recent_growth_count, "회")
-        consecutive = _format_integer(view.growth.consecutive_growth_quarters, "분기")
         st.metric(
             "최근 성장 지속성",
             f"최근 4분기 중 {recent}",
-            delta=f"연속 증가 {consecutive}",
-            delta_color="off",
-            delta_arrow="off",
+            delta=view.growth.consecutive_growth_quarters,
+            delta_color="green",
+            delta_arrow="up",
+            delta_description="연속 증가",
+            format="%.0f분기",
             width="stretch",
         )
 
-    _render_insight(insight, insight_badge, insight_badge_color, "growth-insight")
+    _render_insight(
+        insight,
+        _direction_badge(insight_badge, yoy_change),
+        insight_badge_color,
+        "growth-insight",
+    )
 
     chart_column, contribution_column = st.columns([0.65, 0.35], gap="medium")
     with chart_column:
@@ -936,19 +1071,36 @@ def _render_customer_section(view: ReportView) -> None:
     with metric_columns[0]:
         st.metric(
             "유동인구 전년 동기 대비",
-            _format_percent(view.customer.floating_yoy_change),
+            _direction_value(view.customer.floating_yoy_change),
+            delta=view.customer.floating_yoy_change,
+            delta_color="normal",
+            delta_arrow="auto",
+            format="%+.1f%%",
             width="stretch",
         )
     with metric_columns[1]:
         st.metric(
             "점포 수 전년 동기 대비",
-            _format_percent(view.customer.store_yoy_change),
+            _direction_value(view.customer.store_yoy_change),
+            delta=view.customer.store_yoy_change,
+            delta_color="normal",
+            delta_arrow="auto",
+            format="%+.1f%%",
             width="stretch",
         )
     with metric_columns[2]:
         st.metric(
             "수요–점포 성장 격차",
-            _format_percentage_points(view.customer.demand_store_gap, signed=True),
+            _direction_value(
+                view.customer.demand_store_gap,
+                "수요 증가 우위",
+                "점포 증가 우위",
+                "증가율 동일",
+            ),
+            delta=view.customer.demand_store_gap,
+            delta_color="normal",
+            delta_arrow="auto",
+            format="%+.1f%%p",
             width="stretch",
         )
 
@@ -967,7 +1119,7 @@ def _render_customer_section(view: ReportView) -> None:
         customer_badge_color = "blue"
     _render_insight(
         view.customer.summary_text,
-        customer_badge,
+        _direction_badge(customer_badge, gap),
         customer_badge_color,
         "customer-insight",
     )
@@ -1106,17 +1258,27 @@ def _render_context_section(view: ReportView) -> None:
 
 def _render_model_section(view: ReportView) -> None:
     _render_section_header(
-        "분석 근거",
+        "매출 예측 해석",
         "설명 가능한 머신러닝이 점포당 매출 차이를 설명할 때 활용한 특성과 선택 상권의 예측 근거입니다.",
         MODEL_FORMULAS,
         "model_formula",
     )
-    model_columns = st.columns(4, gap="small", border=True)
+    model_columns = st.columns(3, gap="small", border=True)
     with model_columns[0]:
-        st.metric("선택 모델", f"후보 {view.model.candidate}", width="stretch")
+        st.metric(
+            "실제 분기 점포당 매출",
+            view.model.actual_sales_display,
+            delta=(
+                f"예측 {view.model.predicted_sales_display} · 오차 "
+                f"{_format_percent(view.model.prediction_error_rate)}"
+            ),
+            delta_color="off",
+            delta_arrow="off",
+            width="stretch",
+        )
     with model_columns[1]:
         st.metric(
-            "검증 로그 R²",
+            "결정 계수",
             _format_decimal(view.model.validation_log_r2, 3),
             delta=(
                 f"검증 표본 {_format_integer(view.model.validation_rows, '개')}"
@@ -1131,18 +1293,6 @@ def _render_model_section(view: ReportView) -> None:
         st.metric(
             "중앙 절대 오차율",
             _format_percent(view.model.validation_mape, signed=False),
-            width="stretch",
-        )
-    with model_columns[3]:
-        st.metric(
-            "실제 분기 점포당 매출",
-            view.model.actual_sales_display,
-            delta=(
-                f"예측 {view.model.predicted_sales_display} · 오차 "
-                f"{_format_percent(view.model.prediction_error_rate)}"
-            ),
-            delta_color="off",
-            delta_arrow="off",
             width="stretch",
         )
     st.caption(view.model.training_period)
@@ -1174,13 +1324,6 @@ def _render_model_section(view: ReportView) -> None:
         "모델 중요도와 예측 기여값은 매출의 원인이나 출점 추천을 의미하지 않습니다.",
         icon=":material/info:",
     )
-
-
-def _render_review_section(view: ReportView) -> None:
-    with st.container(border=True):
-        st.markdown("#### 현장 확인 포인트")
-        for point in view.review_points:
-            st.markdown(f"- {point}")
 
 
 def _render_section_header(
@@ -1274,6 +1417,11 @@ def _growth_trend_chart(
 
 
 def _contribution_chart(frame: pd.DataFrame) -> alt.Chart:
+    frame = frame.assign(
+        direction_label=frame["log_contribution"].map(_direction_arrow_label)
+    )
+    x_domain = _signed_label_domain(frame["log_contribution"])
+
     base = alt.Chart(frame).encode(
         y=alt.Y(
             "component:N",
@@ -1281,7 +1429,11 @@ def _contribution_chart(frame: pd.DataFrame) -> alt.Chart:
             sort=None,
             axis=alt.Axis(labelLimit=120),
         ),
-        x=alt.X("log_contribution:Q", title="로그 성장 기여도"),
+        x=alt.X(
+            "log_contribution:Q",
+            title="로그 성장 기여도",
+            scale=alt.Scale(domain=x_domain, nice=False),
+        ),
         color=alt.Color("color:N", scale=None, legend=None),
         tooltip=[
             alt.Tooltip("component:N", title="구성 요소"),
@@ -1291,20 +1443,20 @@ def _contribution_chart(frame: pd.DataFrame) -> alt.Chart:
     bars = base.mark_bar(cornerRadius=5, size=28)
     positive_labels = (
         alt.Chart(frame.loc[frame["log_contribution"].ge(0)])
-        .mark_text(align="left", dx=7, color=CHART_INK, fontWeight="bold")
+        .mark_text(align="left", dx=7, color=CHART_TEAL, fontWeight="bold")
         .encode(
             y=alt.Y("component:N", sort=None),
             x=alt.X("log_contribution:Q"),
-            text=alt.Text("log_contribution:Q", format="+.1f"),
+            text=alt.Text("direction_label:N"),
         )
     )
     negative_labels = (
         alt.Chart(frame.loc[frame["log_contribution"].lt(0)])
-        .mark_text(align="right", dx=-7, color=CHART_INK, fontWeight="bold")
+        .mark_text(align="right", dx=-7, color=CHART_CORAL, fontWeight="bold")
         .encode(
             y=alt.Y("component:N", sort=None),
             x=alt.X("log_contribution:Q"),
-            text=alt.Text("log_contribution:Q", format="+.1f"),
+            text=alt.Text("direction_label:N"),
         )
     )
     rule = (
@@ -1440,6 +1592,10 @@ def _global_model_chart(frame: pd.DataFrame) -> alt.Chart:
 
 
 def _local_model_chart(frame: pd.DataFrame) -> alt.Chart:
+    frame = frame.assign(
+        direction_label=frame["sales_ratio_contribution"].map(_direction_arrow_label)
+    )
+    x_domain = _signed_label_domain(frame["sales_ratio_contribution"])
     rule = (
         alt.Chart(pd.DataFrame({"x": [0]}))
         .mark_rule(color=CHART_MUTED)
@@ -1450,7 +1606,11 @@ def _local_model_chart(frame: pd.DataFrame) -> alt.Chart:
         .mark_bar(cornerRadius=5, size=24)
         .encode(
             y=alt.Y("term_label:N", title=None, sort=None),
-            x=alt.X("sales_ratio_contribution:Q", title="예측값 방향 기여(%)"),
+            x=alt.X(
+                "sales_ratio_contribution:Q",
+                title="예측값 방향 기여(%)",
+                scale=alt.Scale(domain=x_domain, nice=False),
+            ),
             color=alt.Color("color:N", scale=None, legend=None),
             tooltip=[
                 alt.Tooltip("term_label:N", title="분석 특성"),
@@ -1462,7 +1622,42 @@ def _local_model_chart(frame: pd.DataFrame) -> alt.Chart:
             ],
         )
     )
-    return _style_chart((bars + rule).properties(height=alt.Step(40)))
+    positive_labels = (
+        alt.Chart(frame.loc[frame["sales_ratio_contribution"].ge(0)])
+        .mark_text(align="left", dx=7, color=CHART_TEAL, fontWeight="bold")
+        .encode(
+            y=alt.Y("term_label:N", sort=None),
+            x=alt.X("sales_ratio_contribution:Q"),
+            text=alt.Text("direction_label:N"),
+        )
+    )
+    negative_labels = (
+        alt.Chart(frame.loc[frame["sales_ratio_contribution"].lt(0)])
+        .mark_text(align="right", dx=-7, color=CHART_CORAL, fontWeight="bold")
+        .encode(
+            y=alt.Y("term_label:N", sort=None),
+            x=alt.X("sales_ratio_contribution:Q"),
+            text=alt.Text("direction_label:N"),
+        )
+    )
+    return _style_chart(
+        (bars + positive_labels + negative_labels + rule).properties(height=alt.Step(40))
+    )
+
+
+def _signed_label_domain(values: pd.Series) -> list[float]:
+    """Reserve space beyond signed bar ends for externally placed value labels."""
+    numeric_values = pd.to_numeric(values, errors="coerce").dropna()
+    if numeric_values.empty or numeric_values.abs().max() == 0:
+        return [-1.0, 1.0]
+
+    domain_min = min(float(numeric_values.min()), 0.0)
+    domain_max = max(float(numeric_values.max()), 0.0)
+    label_padding = (domain_max - domain_min) * 0.25
+    return [
+        domain_min - label_padding if domain_min < 0 else 0.0,
+        domain_max + label_padding if domain_max > 0 else 0.0,
+    ]
 
 
 def _style_chart(chart: alt.TopLevelMixin) -> alt.TopLevelMixin:
@@ -1548,6 +1743,47 @@ def _change_markup(value: object) -> str:
     if number < 0:
         return f":red[:material/arrow_downward: {number:+.1f}%]"
     return ":gray[:material/arrow_forward: 0.0%]"
+
+
+def _direction_value(
+    value: object,
+    positive: str = "증가",
+    negative: str = "감소",
+    zero: str = "변동 없음",
+) -> str:
+    """Return a concise direction label for a signed report metric."""
+    number = _number(value)
+    if number is None:
+        return "비교 불가"
+    if number > 0:
+        return positive
+    if number < 0:
+        return negative
+    return zero
+
+
+def _direction_arrow_label(value: object) -> str:
+    """Format a signed chart value with a matching direction arrow."""
+    number = _number(value)
+    if number is None:
+        return "—"
+    if number > 0:
+        return f"↑ {number:+.1f}"
+    if number < 0:
+        return f"↓ {number:+.1f}"
+    return "→ 0.0"
+
+
+def _direction_badge(label: str, value: object) -> str:
+    """Prefix a directional badge label with the matching arrow."""
+    number = _number(value)
+    if number is None:
+        return label
+    if number > 0:
+        return f"↑ {label}"
+    if number < 0:
+        return f"↓ {label}"
+    return f"→ {label}"
 
 
 def _format_integer(value: object, unit: str) -> str:

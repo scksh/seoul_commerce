@@ -1,49 +1,58 @@
 # Seoul Commerce
 
-## OpenAPI 인증키 설정
+서울 열린데이터광장의 상권 데이터를 수집·전처리하고, 상권별 매출·고객·경쟁 환경과 Explainable Boosting Machine(EBM) 분석 결과를 지도 기반 Streamlit 대시보드로 제공하는 프로젝트입니다.
 
-서울 열린데이터광장에서 인증키를 발급받은 뒤 프로젝트 루트의 `.env`에 입력합니다.
+> 추정매출과 모델 결과는 후보 상권을 비교하기 위한 참고 정보이며, 실제 수익성이나 미래 성과를 보장하지 않습니다.
+
+## 빠른 실행
+
+### 요구 사항
+
+- Python 3.12 이상
+- [uv](https://docs.astral.sh/uv/)
+
+```powershell
+uv sync
+uv run streamlit run app.py
+```
+
+브라우저에서 안내되는 로컬 주소로 접속합니다. 저장소에 포함된 `data/mart` 분석 마트를 사용하므로 대시보드 조회만 할 때는 서울시 API 키가 필요하지 않습니다.
+
+AI 분석 인사이트 기능은 선택 사항입니다. 사용하려면 `.env.example`을 복사한 뒤 OpenAI API 키를 입력합니다.
+
+```powershell
+Copy-Item .env.example .env
+```
 
 ```dotenv
-SEOUL_OPEN_DATA_API_KEY=발급받은_인증키
+OPENAI_API_KEY=your_openai_api_key
 ```
 
-`.env`는 Git에서 제외되며 실제 키를 커밋하지 않습니다. `.env.example`에는 변수명만 유지합니다.
+버튼을 누를 때만 현재 선택한 상권·업종의 리포트 지표가 OpenAI Responses API(`gpt-4o-mini`)로 전송됩니다. 요청에는 `store: false`가 적용되며 결과는 현재 브라우저 세션에만 유지됩니다.
 
-## 한국어 컬럼 CSV 복사본 만들기
+## 주요 기능
 
-원본 CSV는 `data/raw`에 그대로 두고, 기존 영문 변환용
-`config/column_mapping.yml`은 변경하지 않습니다. 한국어 복사본 전용
-`config/column_mapping_ko.yml`의
-`원본 컬럼명: 한국어 컬럼명` 매핑을 적용한 복사본을 `data/korean`에 생성합니다.
+- 자치구·행정동·업종 조건별 유망 상권 탐색 및 지도 시각화
+- 매출 성장, 고객 구성, 경쟁 밀도, 배후 환경 비교
+- EBM 기반 예측 성능과 전역·개별 변수 기여도 제공
+- 선택 상권 리포트의 AI 요약(선택 기능)
 
-전체 원본 CSV를 변환합니다.
+## 데이터 수집 및 분석 재실행
+
+서울 열린데이터광장에서 인증키를 발급받아 `.env`에 설정합니다.
+
+```dotenv
+SEOUL_OPEN_DATA_API_KEY=your_seoul_open_data_api_key
+```
+
+수집 가능한 데이터셋 이름은 `trade_area`, `stores`, `sales`, `floating_population`, `resident_population`, `working_population`, `facilities`입니다. 아래처럼 데이터셋별로 수집하며, 분기형 데이터는 필요하면 `--quarter`를 지정합니다.
 
 ```powershell
-uv run seoul-commerce-korean
+uv run seoul-commerce trade_area
+uv run seoul-commerce sales --quarter 20251
 ```
 
-일부 데이터셋만 변환할 수도 있습니다.
-
-```powershell
-uv run seoul-commerce-korean sales stores
-```
-
-다른 출력 위치가 필요하면 `--output-dir`을 지정합니다.
-
-```powershell
-uv run seoul-commerce-korean trade_area --output-dir data/sample_korean
-```
-
-등록되지 않은 원본 컬럼이 발견되면 잘못 해석하지 않도록 변환을 중단하고 해당
-컬럼명을 출력합니다. 이때 `config/column_mapping_ko.yml`에 매핑을 먼저 추가합니다.
-
-## 분석 마트와 EBM 모델
-
-분석 설정은 `config/analysis_pipeline.yml`에서 관리합니다. 기본 기준분기는
-`20261`, 추세 범위는 최근 8분기이며 전처리된 영문 분석 CSV를 입력으로 사용합니다.
-
-운영 실행 순서는 전처리, 모델 학습, 마트 생성입니다.
+원천 데이터 전체를 준비한 뒤 분석 산출물을 순서대로 생성합니다.
 
 ```powershell
 uv run seoul-commerce-preprocess
@@ -51,36 +60,62 @@ uv run seoul-commerce-train-ebm
 uv run seoul-commerce-build-marts
 ```
 
-기존 영문 분석 마트를 유지하면서 한국어 헤더와 설명값을 가진 별도 복사본을
-`data/mart/korean`에 만들려면 다음 명령을 실행합니다.
+- 원천 CSV: `data/raw`
+- 전처리 결과: `data/analysis/english`
+- 모델·평가 파일: `outputs/models`
+- 대시보드 마트: `data/mart`
+- 기준 분기와 모델 설정: `config/analysis_pipeline.yml`
+
+한국어 컬럼 사본이 필요하면 다음 명령을 사용합니다.
 
 ```powershell
+uv run seoul-commerce-korean
 uv run seoul-commerce-korean-marts
 ```
 
-모델 학습 중에는 후보·검증 폴드별 시작과 완료, 30초 간격 경과시간, 성능,
-홀드아웃 평가와 전체 재학습 상태가 출력됩니다. 자동화 환경에서 출력을 생략하려면
-`uv run seoul-commerce-train-ebm --quiet`을 사용합니다.
-
-모델 학습 명령은 후보 A/B/C를 모두 기준분기 `20261` 이전 자료로 학습하고,
-동일한 `20261` 검증분기 성능으로 비교합니다. 따라서 `20261`은 후보 선택과 성능
-보고에 함께 사용되며 별도의 미공개 홀드아웃은 아닙니다. 선택된 후보는 전체 가용
-데이터로 다시 학습됩니다. 모델은 `outputs/models`, 모델 성능·전역/지역 설명과
-기술 마트는 `data/mart`에 저장됩니다.
-
-기준분기나 출력 경로를 바꾸는 예시는 다음과 같습니다.
-
-```powershell
-uv run seoul-commerce-train-ebm --reference-quarter 20261 --model-dir outputs/models
-uv run seoul-commerce-build-marts --reference-quarter 20261 --output-dir data/mart
-```
-
-`seoul-commerce-build-marts`는 모델을 다시 학습하지 않습니다. 같은 기준분기의
-`ebm_evaluation_<분기>.joblib`이 있으면 저장된 예측과 설명 결과를 요약 마트에
-결합하고, 없으면 기술 분석 마트와 빈 모델 결과 CSV를 생성합니다.
-
-전체 테스트는 다음 명령으로 실행합니다.
+테스트는 다음과 같이 실행합니다.
 
 ```powershell
 uv run python -m unittest discover -s tests -v
+uv run python -m unittest discover -s tests/dashboard -v
 ```
+
+## 데이터 출처
+
+원천 데이터는 서울특별시 또는 서울신용보증재단 저작물이며, 서울신용보증재단이 제공하는 **서울시 상권분석서비스** 데이터입니다.
+
+| 데이터 | ID | 갱신 주기 | 출처 |
+| --- | --- | --- | --- |
+| 영역-상권 | OA-15560 | 비정기 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15560/A/1/datasetView.do) |
+| 점포-상권 | OA-15577 | 연간 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15577/A/1/datasetView.do) |
+| 추정매출-상권 | OA-15572 | 분기 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15572/A/1/datasetView.do) |
+| 길단위인구-상권 | OA-15568 | 월간 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15568/A/1/datasetView.do) |
+| 상주인구-상권 | OA-15584 | 반기 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15584/A/1/datasetView.do) |
+| 직장인구-상권 | OA-15569 | 반기 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15569/A/1/datasetView.do) |
+| 집객시설-상권 | OA-15580 | 연간 | [서울 열린데이터광장](https://data.seoul.go.kr/dataList/OA-15580/A/1/datasetView.do) |
+
+데이터별 스키마와 수집 상태는 `config/data_contracts.yml`에서 관리합니다. 원천 데이터의 갱신 시점과 제공 기준이 바뀔 수 있으므로 재수집 전 각 출처 페이지를 확인하세요.
+
+## 라이선스
+
+### 프로젝트 코드
+
+프로젝트에서 작성한 소스 코드는 [MIT License](LICENSE)로 배포합니다. 주요 직접 의존성은 모두 상업적 이용과 수정·재배포가 가능한 허용형 오픈소스 라이선스입니다.
+
+| 라이선스 | 주요 라이브러리 |
+| --- | --- |
+| MIT | Folium, InterpretML, Plotly, PyYAML, streamlit-folium, xmltodict |
+| BSD 3-Clause/BSD | ipykernel, Joblib, Jupyter, pandas, python-dotenv, scikit-learn, seaborn, statsmodels |
+| Apache 2.0 | Requests, Streamlit |
+| PSF 기반 Matplotlib License | Matplotlib |
+| MIT/MPL 2.0 | tqdm |
+
+정확한 설치 버전은 `uv.lock`, 전체 직접 의존성은 `pyproject.toml`을 기준으로 합니다. 각 라이브러리 자체에는 해당 라이브러리의 라이선스가 별도로 적용됩니다.
+
+### 데이터
+
+원천 데이터와 이를 가공한 산출물에는 코드의 MIT License가 적용되지 않습니다. 각 출처 페이지에 표시된 **공공누리 제1유형(출처표시, 상업적 이용 및 변경 가능)** 조건을 따릅니다.
+
+> 본 프로젝트는 서울특별시 및 서울신용보증재단이 공공누리 제1유형으로 개방한 ‘서울시 상권분석서비스’ 데이터를 이용하였으며, 해당 데이터는 [서울 열린데이터광장](https://data.seoul.go.kr/)에서 확인할 수 있습니다.
+
+재배포 시에도 위 출처와 각 데이터셋 이름을 함께 표시해야 합니다. 자세한 조건은 [서울 열린데이터광장 저작권 안내](https://data.seoul.go.kr/etc/openInfo.do)와 개별 데이터셋 페이지를 우선 확인하세요.

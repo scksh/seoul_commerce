@@ -13,9 +13,23 @@ wheels/
 .env
 .env.*
 !.env.example
+.streamlit/secrets.toml
 
 # Generated data copies
-data/
+data/*
+
+# Dashboard marts required by Streamlit Community Cloud
+!data/mart/
+data/mart/*
+!data/mart/dashboard_*.csv
+!data/mart/model_metrics.csv
+
+# Trade-area master required by the dashboard
+!data/analysis/
+data/analysis/*
+!data/analysis/english/
+data/analysis/english/*
+!data/analysis/english/trade_area_master.csv
 
 # Trained models and evaluation artifacts
 outputs/

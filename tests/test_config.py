@@ -16,7 +16,12 @@ import unittest
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from seoul_commerce.config import SEOUL_API_KEY_NAME, load_api_key
+from seoul_commerce.config import (
+    OPENAI_API_KEY_NAME,
+    SEOUL_API_KEY_NAME,
+    load_api_key,
+    load_openai_api_key,
+)
 
 
 class ApiKeyConfigTests(unittest.TestCase):
@@ -40,6 +45,14 @@ class ApiKeyConfigTests(unittest.TestCase):
         with TemporaryDirectory() as directory, patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(ValueError, SEOUL_API_KEY_NAME):
                 load_api_key(os.path.join(directory, "missing.env"))
+
+    def test_load_openai_api_key_from_env_file(self) -> None:
+        with TemporaryDirectory() as directory, patch.dict(os.environ, {}, clear=True):
+            env_file = os.path.join(directory, ".env")
+            with open(env_file, "w", encoding="utf-8") as file:
+                file.write(f"{OPENAI_API_KEY_NAME}=openai-test-key\n")
+
+            self.assertEqual(load_openai_api_key(env_file), "openai-test-key")
 
 
 if __name__ == "__main__":

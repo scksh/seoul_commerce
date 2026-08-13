@@ -2,14 +2,23 @@ from __future__ import annotations
 
 from dataclasses import replace
 import unittest
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
+from seoul_commerce.dashboard.ai_insights import AIInsight
 from seoul_commerce.dashboard.data import ReportMarts
+from seoul_commerce.dashboard import report as report_module
 from seoul_commerce.dashboard.report import (
+    _ai_insight_state_key,
     _density_chart,
+    _direction_arrow_label,
+    _direction_badge,
+    _direction_value,
     _growth_trend_chart,
+    _local_model_chart,
     build_report_view,
+    clear_ai_insight_state,
 )
 
 
@@ -122,22 +131,30 @@ class ReportTests(unittest.TestCase):
         )
         model_global = pd.DataFrame(
             {
-                "execution_id": ["run-1", "run-1"],
-                "term": ["log_floating_population", "log_store_density"],
-                "term_type": ["main", "main"],
-                "role": ["analysis_factor", "analysis_factor"],
-                "importance_share": [0.6, 0.4],
+                "execution_id": ["run-1", "run-1", "run-1"],
+                "term": [
+                    "log_floating_population",
+                    "log_store_density",
+                    "log_working_population & industry",
+                ],
+                "term_type": ["main", "main", "interaction"],
+                "role": ["analysis_factor", "analysis_factor", "analysis_factor"],
+                "importance_share": [0.6, 0.4, 0.8],
             }
         )
         model_local = pd.DataFrame(
             {
-                "base_quarter": ["20261", "20261"],
-                "execution_id": ["run-1", "run-1"],
-                "trade_area_code": ["A", "A"],
-                "industry_code": ["I", "I"],
-                "term": ["log_floating_population", "log_store_density"],
-                "term_type": ["main", "main"],
-                "sales_ratio_contribution": [0.12, -0.05],
+                "base_quarter": ["20261", "20261", "20261"],
+                "execution_id": ["run-1", "run-1", "run-1"],
+                "trade_area_code": ["A", "A", "A"],
+                "industry_code": ["I", "I", "I"],
+                "term": [
+                    "log_floating_population",
+                    "log_store_density",
+                    "log_working_population & industry",
+                ],
+                "term_type": ["main", "main", "interaction"],
+                "sales_ratio_contribution": [0.12, -0.05, 0.9],
             }
         )
         self.marts = ReportMarts(
@@ -174,6 +191,8 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(report.model.prediction_error_rate, 8.0)
         self.assertEqual(len(report.model.global_terms), 2)
         self.assertEqual(len(report.model.local_terms), 2)
+        self.assertNotIn("직장인구 × 업종", report.model.global_terms["term_label"].tolist())
+        self.assertNotIn("직장인구 × 업종", report.model.local_terms["term_label"].tolist())
 
     def test_incomplete_history_is_exposed_without_inventing_a_trend(self) -> None:
         summary = self.summary.copy()
@@ -211,6 +230,70 @@ class ReportTests(unittest.TestCase):
         for chart in charts:
             spec = chart.to_dict()
             self.assertEqual(spec["config"]["axis"]["labelAngle"], 0)
+
+    def test_change_directions_use_matching_labels_and_arrows(self) -> None:
+        self.assertEqual(_direction_value(3.2), "증가")
+        self.assertEqual(_direction_value(-1.5), "감소")
+        self.assertEqual(_direction_value(0), "변동 없음")
+        self.assertEqual(_direction_value(None), "비교 불가")
+        self.assertEqual(_direction_arrow_label(3.2), "↑ +3.2")
+        self.assertEqual(_direction_arrow_label(-1.5), "↓ -1.5")
+        self.assertEqual(_direction_arrow_label(0), "→ 0.0")
+        self.assertEqual(_direction_badge("증가", 3.2), "↑ 증가")
+        self.assertEqual(_direction_badge("감소", -1.5), "↓ 감소")
+        self.assertEqual(_direction_badge("정체", 0), "→ 정체")
+
+    def test_local_model_chart_reserves_space_for_external_value_labels(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "term_label": ["점포 밀도", "유동인구"],
+                "sales_ratio_contribution": [-5.0, 12.0],
+                "color": ["#E76F51", "#2A9D8F"],
+            }
+        )
+
+        spec = _local_model_chart(frame).to_dict()
+        domain = spec["layer"][0]["encoding"]["x"]["scale"]["domain"]
+
+        self.assertLess(domain[0], -5.0)
+        self.assertGreater(domain[1], 12.0)
+
+    def test_ai_insight_button_is_hidden_after_successful_generation(self) -> None:
+        report = build_report_view(self.summary, self.marts, "A", "한식음식점")
+        insight = AIInsight(
+            assessment="중립적",
+            overall_conclusion="결론",
+            key_evidence=("근거 1", "근거 2", "근거 3"),
+            opportunities=("기회",),
+            risks=("위험",),
+            recommended_actions=("제안",),
+            data_limitations=("한계",),
+        )
+        state = {_ai_insight_state_key(report): insight}
+
+        with (
+            patch.object(report_module.st, "session_state", state),
+            patch.object(report_module.st, "container", return_value=MagicMock()),
+            patch.object(report_module.st, "markdown"),
+            patch.object(report_module.st, "button") as button,
+            patch.object(report_module, "_render_ai_insight") as render_insight,
+        ):
+            report_module._render_ai_insight_section(report)
+
+        button.assert_not_called()
+        render_insight.assert_called_once_with(insight)
+
+    def test_clearing_report_removes_only_ai_insight_state(self) -> None:
+        state = {
+            "ai_report_insight:A:I:2026년 1분기": object(),
+            "ai_report_insight:B:I:2026년 1분기": object(),
+            "selected_trade_area_code": "A",
+        }
+
+        with patch.object(report_module.st, "session_state", state):
+            clear_ai_insight_state()
+
+        self.assertEqual(state, {"selected_trade_area_code": "A"})
 
 
 if __name__ == "__main__":
