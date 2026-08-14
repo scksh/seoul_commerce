@@ -2,6 +2,8 @@
 
 서울 열린데이터광장의 상권 데이터를 수집·전처리하고, 상권별 매출·고객·경쟁 환경과 Explainable Boosting Machine(EBM) 분석 결과를 지도 기반 Streamlit 대시보드로 제공하는 프로젝트입니다.
 
+## 대시보드 
+- [streamlit 대시보드](https://seoul-commerce.streamlit.app/)
 
 ## 빠른 실행
 
